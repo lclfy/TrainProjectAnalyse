@@ -21,3 +21,4 @@ Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProje
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.csproj.CopyComplete
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.exe
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.pdb
+Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.AnalyseForm.resources

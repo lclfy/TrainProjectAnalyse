@@ -31,6 +31,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.start_btn = new System.Windows.Forms.Button();
             this.check_btn = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // richTextBox1
@@ -57,14 +58,25 @@
             this.check_btn.Name = "check_btn";
             this.check_btn.Size = new System.Drawing.Size(171, 65);
             this.check_btn.TabIndex = 2;
-            this.check_btn.Text = "检视";
+            this.check_btn.Text = "查看所有";
             this.check_btn.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(30, 728);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(162, 65);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "检视";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 810);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.check_btn);
             this.Controls.Add(this.start_btn);
             this.Controls.Add(this.richTextBox1);
@@ -80,6 +92,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Button start_btn;
         private System.Windows.Forms.Button check_btn;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -11,8 +11,7 @@ namespace TrainProjectAnalyse
         //命令号
         public string commandID { get; set; }
         //起始日期 结束日期
-        public DateTime startDate { get; set; }
-        public DateTime stopDate { get; set; }
+        public List<DateTime> effectiveDates { get; set; }
         //车次
         public string firstTrainNum { get; set; }
         public string secondTrainNum { get; set; }
@@ -22,6 +21,7 @@ namespace TrainProjectAnalyse
         public TrainModel()
         {
             createTime = DateTime.Now;
+            effectiveDates = new List<DateTime>();
             commandID = "";
             firstTrainNum = "";
             secondTrainNum = "";
@@ -29,14 +29,13 @@ namespace TrainProjectAnalyse
         }
 
         public TrainModel(DateTime _createTime, string _commandID,
-                                            DateTime _startDate,DateTime _stopDate,
+                                            List<DateTime> _effectiveDates,
                                             string _firstTrainNum,string _secondTrainNum,
                                             int _streamStatus)
         {
             this.createTime = _createTime;
             this.commandID = _commandID;
-            this.startDate = _startDate;
-            this.stopDate = _stopDate;
+            this.effectiveDates = _effectiveDates;
             this.firstTrainNum = _firstTrainNum;
             this.secondTrainNum = _secondTrainNum;
             this.streamStatus = _streamStatus;
