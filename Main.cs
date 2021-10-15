@@ -1,19 +1,23 @@
-﻿using System;
+﻿using CCWin;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using CCWin;
 
 namespace TrainProjectAnalyse
 {
     public partial class Main : Skin_Mac
     {
+        //Excel内的命令
+        List<CommandModel> allCurrentModels;
+        List<TrainModel> allCurrentTrainModels;
+        //新添加的命令
         List<CommandModel> allCommands;
         string commandText = "";
+        IWorkbook WorkBook;
 
         public Main()
         {
@@ -22,7 +26,165 @@ namespace TrainProjectAnalyse
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            refreshData();
+            WorkBook = loadExcel();
+            if(WorkBook != null)
+            {
+                loadData();
+            }
+        }
+
+        private void refreshData()
+        {
             allCommands = new List<CommandModel>();
+            allCurrentModels = new List<CommandModel>();
+            allCurrentTrainModels = new List<TrainModel>();
+        }
+
+
+        private void loadData()
+        {
+            ISheet sheetCommands = WorkBook.GetSheet("Commands");
+            ISheet sheetTrains = WorkBook.GetSheet("Trains");
+            bool titleRow = true;
+            foreach(IRow row in sheetCommands)
+            {
+                //首行跳过
+                if (titleRow)
+                {
+                    titleRow = false;
+                    continue;
+                }
+                CommandModel _cm = new CommandModel();
+                if (row.GetCell(0) != null)
+                {
+                    _cm.createTime = DateTime.Parse(row.GetCell(0).ToString());
+                }
+                else
+                {
+                    _cm.createTime = DateTime.Parse("0001/01/01");
+                }
+                if (row.GetCell(1) != null)
+                {
+                    _cm.commandID = row.GetCell(1).ToString();
+                }
+                else
+                {
+                    _cm.commandID = "";
+                }
+                if (row.GetCell(2) != null)
+                {
+                    _cm.fileName = row.GetCell(2).ToString();
+                }
+                else
+                {
+                    _cm.fileName = "";
+                }
+                allCurrentModels.Add(_cm);
+            }
+            titleRow = true;
+            foreach (IRow row in sheetTrains)
+            {
+                //首行跳过
+                if (titleRow)
+                {
+                    titleRow = false;
+                    continue;
+                }
+                TrainModel _tm = new TrainModel();
+                if (row.GetCell(0) != null)
+                {
+                    _tm.createTime = DateTime.Parse(row.GetCell(0).ToString());
+                }
+                else
+                {
+                    _tm.createTime = DateTime.Parse("0001/01/01");
+                }
+                if (row.GetCell(1) != null)
+                {
+                    _tm.commandID = row.GetCell(1).ToString();
+                }
+                else
+                {
+                    _tm.commandID = "";
+                }
+                if (row.GetCell(2) != null)
+                {
+                    _tm.placeInCommand = row.GetCell(2).ToString();
+                }
+                else
+                {
+                    _tm.placeInCommand = "";
+                }
+                if (row.GetCell(3) != null)
+                {
+                    _tm.firstTrainNum = row.GetCell(3).ToString();
+                }
+                else
+                {
+                    _tm.firstTrainNum = "";
+                }
+                if (row.GetCell(4) != null)
+                {
+                    _tm.secondTrainNum = row.GetCell(4).ToString();
+                }
+                else
+                {
+                    _tm.secondTrainNum = "";
+                }
+                if (row.GetCell(5) != null)
+                {
+                    _tm.streamStatus = int.Parse(row.GetCell(5).ToString());
+                }
+                else
+                {
+                    _tm.streamStatus = -1;
+                }
+                if (row.GetCell(6) != null)
+                {
+                    List<DateTime> _dt = new List<DateTime>();
+                    string[] allDates = row.GetCell(6).ToString().Split(',');
+                    foreach(string _date in allDates)
+                    {
+                        _dt.Add(DateTime.Parse(_date));
+                    }
+                    _tm.effectiveDates = _dt;
+                }
+                else
+                {
+                    _tm.effectiveDates = null;
+                }
+                allCurrentTrainModels.Add(_tm);
+            }
+            int a = 0;
+        }
+
+        //获取总数据
+        private IWorkbook loadExcel()
+        {
+            //读取文件
+            IWorkbook workBook;
+            string fileName = Application.StartupPath + "\\Data.xls";
+            FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+            try
+            {
+                workBook = new HSSFWorkbook(fileStream);  //xlsx数据读入workbook  
+                if(workBook == null)
+                {
+                    MessageBox.Show("读取总数据时出现错误(Data.xls)\n" + fileName + "\n错误内容：" , "提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return null;
+                }
+                else
+                {
+                    return workBook;
+                }
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("读取总数据时出现错误(Data.xls)\n" + fileName + "\n错误内容：" + e.ToString().Split('在')[0], "提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return null;
+            }
         }
 
         //读取粘贴的命令
@@ -384,7 +546,8 @@ namespace TrainProjectAnalyse
 
         private void button1_Click(object sender, EventArgs e)
         {
-            AnalyseForm _af = new AnalyseForm(allCommands,commandText);
+            AnalyseForm _af = new AnalyseForm(allCommands,commandText,WorkBook);
+            _af.Owner = this;
             _af.Show();
         }
     }

@@ -11,12 +11,15 @@ namespace TrainProjectAnalyse
         //命令号
         public string commandID { get; set; }
         //起始日期 结束日期
+        //日期格式yyyy/MM/dd，存储时以英文逗号区分
         public List<DateTime> effectiveDates { get; set; }
         //车次
         public string firstTrainNum { get; set; }
         public string secondTrainNum { get; set; }
         //0停运，1恢复开行，-1未定义
         public int streamStatus { get; set; }
+        //命令中的第几条
+        public string placeInCommand { get; set; }
 
         public TrainModel()
         {
@@ -26,6 +29,7 @@ namespace TrainProjectAnalyse
             firstTrainNum = "";
             secondTrainNum = "";
             streamStatus = -1;
+            placeInCommand = "";
         }
 
         public TrainModel(DateTime _createTime, string _commandID,
