@@ -113,7 +113,7 @@ namespace TrainProjectAnalyse
             }
             this.analysisListView.EndUpdate();
         }
-        private void getDateTime(string _titleID,string _ID)
+        private TrainModel  getTrainAndDateTime(string _titleID,string _ID)
         {
             string _tempTitle = _titleID.Replace("第", "").Replace("项", "");
             int titleID = 0;
@@ -127,6 +127,7 @@ namespace TrainProjectAnalyse
             List<CommandModel> _allCM = AllCommands;
             CommandModel _cm = _allCM[titleID];
             TrainModel _tm = _cm.allTrainModel[selectedID];
+            //找到车了，返回这个车，刷新它的时间列表
             foreach(DateTime _dt in _tm.effectiveDates)
             {
                 ListViewItem item = new ListViewItem();
@@ -134,12 +135,13 @@ namespace TrainProjectAnalyse
                 DateListView.Items.Add(item);
             }
             this.DateListView.EndUpdate();
+            return _tm;
         }
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(analysisListView.SelectedItems.Count != 0)
             {
-                getDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
             }
 
         }
@@ -299,6 +301,7 @@ namespace TrainProjectAnalyse
                                     row.GetCell(4).ToString().Trim().Equals(_tm.secondTrainNum))
                                 {
                                     //有重复的，找时间是否有相同的
+                                    //这里还没来得及写
 
                                     //continueSaveTrain = false;
                                 }
@@ -366,6 +369,48 @@ namespace TrainProjectAnalyse
         private void label3_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void addCM_btn_Click(object sender, EventArgs e)
+        {
+            TrainModel _tm = new TrainModel();
+            EditForm _ef = new EditForm(_tm,0);
+            _ef.Owner = this;
+            _ef.Show();
+        }
+
+        private void EditTrainData()
+        {
+            if (analysisListView.SelectedItems.Count != 0)
+            {
+                TrainModel _tempTrainModel = getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                EditForm _ef = new EditForm(_tempTrainModel, 1);
+                _ef.Owner = this;
+                _ef.Show();
+            }
+        }
+
+        //添加编辑完成后，从子窗口中调用该方法
+        //new为0 ，edit为1
+        public void EditComplete(TrainModel _tm,int newOrEdit)
+        {
+            TrainModel trainModel = _tm;
+            int a = 9;
+        }
+
+        private void editCM_btn_Click(object sender, EventArgs e)
+        {
+            EditTrainData();
+        }
+
+        private void DateListView_DoubleClick(object sender, EventArgs e)
+        {
+            EditTrainData();
+        }
+
+        private void analysisListView_DoubleClick(object sender, EventArgs e)
+        {
+            EditTrainData();
         }
     }
 }
