@@ -28,15 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.analysisListView = new System.Windows.Forms.ListView();
-            this.editCM_btn = new System.Windows.Forms.Button();
-            this.deleteCM_btn = new System.Windows.Forms.Button();
-            this.addCM_btn = new System.Windows.Forms.Button();
-            this.save_btn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.DateListView = new System.Windows.Forms.ListView();
             this.label2 = new System.Windows.Forms.Label();
+            this.addCM_btn = new CCWin.SkinControl.SkinButton();
+            this.editCM_btn = new CCWin.SkinControl.SkinButton();
+            this.deleteCM_btn = new CCWin.SkinControl.SkinButton();
+            this.save_btn = new CCWin.SkinControl.SkinButton();
             this.SuspendLayout();
             // 
             // analysisListView
@@ -50,49 +51,6 @@
             this.analysisListView.UseCompatibleStateImageBehavior = false;
             this.analysisListView.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             this.analysisListView.DoubleClick += new System.EventHandler(this.analysisListView_DoubleClick);
-            // 
-            // editCM_btn
-            // 
-            this.editCM_btn.Location = new System.Drawing.Point(216, 472);
-            this.editCM_btn.Margin = new System.Windows.Forms.Padding(2);
-            this.editCM_btn.Name = "editCM_btn";
-            this.editCM_btn.Size = new System.Drawing.Size(93, 35);
-            this.editCM_btn.TabIndex = 1;
-            this.editCM_btn.Text = "编辑";
-            this.editCM_btn.UseVisualStyleBackColor = true;
-            this.editCM_btn.Click += new System.EventHandler(this.editCM_btn_Click);
-            // 
-            // deleteCM_btn
-            // 
-            this.deleteCM_btn.Location = new System.Drawing.Point(313, 472);
-            this.deleteCM_btn.Margin = new System.Windows.Forms.Padding(2);
-            this.deleteCM_btn.Name = "deleteCM_btn";
-            this.deleteCM_btn.Size = new System.Drawing.Size(93, 35);
-            this.deleteCM_btn.TabIndex = 2;
-            this.deleteCM_btn.Text = "删除";
-            this.deleteCM_btn.UseVisualStyleBackColor = true;
-            // 
-            // addCM_btn
-            // 
-            this.addCM_btn.Location = new System.Drawing.Point(120, 472);
-            this.addCM_btn.Margin = new System.Windows.Forms.Padding(2);
-            this.addCM_btn.Name = "addCM_btn";
-            this.addCM_btn.Size = new System.Drawing.Size(93, 35);
-            this.addCM_btn.TabIndex = 3;
-            this.addCM_btn.Text = "添加";
-            this.addCM_btn.UseVisualStyleBackColor = true;
-            this.addCM_btn.Click += new System.EventHandler(this.addCM_btn_Click);
-            // 
-            // save_btn
-            // 
-            this.save_btn.Location = new System.Drawing.Point(120, 511);
-            this.save_btn.Margin = new System.Windows.Forms.Padding(2);
-            this.save_btn.Name = "save_btn";
-            this.save_btn.Size = new System.Drawing.Size(286, 35);
-            this.save_btn.TabIndex = 4;
-            this.save_btn.Text = "保存";
-            this.save_btn.UseVisualStyleBackColor = true;
-            this.save_btn.Click += new System.EventHandler(this.button4_Click);
             // 
             // label1
             // 
@@ -132,19 +90,103 @@
             this.label2.TabIndex = 8;
             this.label2.Text = "日期（点击车次条目显示）";
             // 
+            // addCM_btn
+            // 
+            this.addCM_btn.BackColor = System.Drawing.Color.Transparent;
+            this.addCM_btn.BaseColor = System.Drawing.Color.DodgerBlue;
+            this.addCM_btn.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.addCM_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.addCM_btn.DownBack = null;
+            this.addCM_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.addCM_btn.ForeColor = System.Drawing.Color.White;
+            this.addCM_btn.Location = new System.Drawing.Point(120, 471);
+            this.addCM_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.addCM_btn.MouseBack = null;
+            this.addCM_btn.Name = "addCM_btn";
+            this.addCM_btn.NormlBack = null;
+            this.addCM_btn.Size = new System.Drawing.Size(94, 35);
+            this.addCM_btn.TabIndex = 9;
+            this.addCM_btn.Text = "添加";
+            this.addCM_btn.UseVisualStyleBackColor = false;
+            this.addCM_btn.Click += new System.EventHandler(this.addCM_btn_Click_1);
+            // 
+            // editCM_btn
+            // 
+            this.editCM_btn.BackColor = System.Drawing.Color.Transparent;
+            this.editCM_btn.BaseColor = System.Drawing.Color.DodgerBlue;
+            this.editCM_btn.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.editCM_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.editCM_btn.DownBack = null;
+            this.editCM_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.editCM_btn.ForeColor = System.Drawing.Color.White;
+            this.editCM_btn.Location = new System.Drawing.Point(216, 471);
+            this.editCM_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.editCM_btn.MouseBack = null;
+            this.editCM_btn.Name = "editCM_btn";
+            this.editCM_btn.NormlBack = null;
+            this.editCM_btn.Size = new System.Drawing.Size(94, 35);
+            this.editCM_btn.TabIndex = 10;
+            this.editCM_btn.Text = "编辑";
+            this.editCM_btn.UseVisualStyleBackColor = false;
+            this.editCM_btn.Click += new System.EventHandler(this.editCM_btn_Click);
+            // 
+            // deleteCM_btn
+            // 
+            this.deleteCM_btn.BackColor = System.Drawing.Color.Transparent;
+            this.deleteCM_btn.BaseColor = System.Drawing.Color.Tomato;
+            this.deleteCM_btn.BorderColor = System.Drawing.Color.Tomato;
+            this.deleteCM_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.deleteCM_btn.DownBack = null;
+            this.deleteCM_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteCM_btn.ForeColor = System.Drawing.Color.White;
+            this.deleteCM_btn.Location = new System.Drawing.Point(312, 471);
+            this.deleteCM_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.deleteCM_btn.MouseBack = null;
+            this.deleteCM_btn.Name = "deleteCM_btn";
+            this.deleteCM_btn.NormlBack = null;
+            this.deleteCM_btn.Size = new System.Drawing.Size(94, 35);
+            this.deleteCM_btn.TabIndex = 11;
+            this.deleteCM_btn.Text = "删除";
+            this.deleteCM_btn.UseVisualStyleBackColor = false;
+            this.deleteCM_btn.Click += new System.EventHandler(this.deleteCM_btn_Click);
+            // 
+            // save_btn
+            // 
+            this.save_btn.BackColor = System.Drawing.Color.Transparent;
+            this.save_btn.BaseColor = System.Drawing.Color.DeepPink;
+            this.save_btn.BorderColor = System.Drawing.Color.DeepPink;
+            this.save_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.save_btn.DownBack = null;
+            this.save_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.save_btn.ForeColor = System.Drawing.Color.White;
+            this.save_btn.Location = new System.Drawing.Point(120, 515);
+            this.save_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.save_btn.MouseBack = null;
+            this.save_btn.Name = "save_btn";
+            this.save_btn.NormlBack = null;
+            this.save_btn.Size = new System.Drawing.Size(286, 35);
+            this.save_btn.TabIndex = 12;
+            this.save_btn.Text = "保存";
+            this.save_btn.UseVisualStyleBackColor = false;
+            this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
+            // 
             // AnalyseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
+            this.BorderColor = System.Drawing.Color.White;
+            this.CaptionBackColorBottom = System.Drawing.Color.White;
+            this.CaptionBackColorTop = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(546, 573);
+            this.Controls.Add(this.save_btn);
+            this.Controls.Add(this.deleteCM_btn);
+            this.Controls.Add(this.editCM_btn);
+            this.Controls.Add(this.addCM_btn);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.DateListView);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.save_btn);
-            this.Controls.Add(this.addCM_btn);
-            this.Controls.Add(this.deleteCM_btn);
-            this.Controls.Add(this.editCM_btn);
             this.Controls.Add(this.analysisListView);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "AnalyseForm";
@@ -158,13 +200,13 @@
         #endregion
 
         private System.Windows.Forms.ListView analysisListView;
-        private System.Windows.Forms.Button editCM_btn;
-        private System.Windows.Forms.Button deleteCM_btn;
-        private System.Windows.Forms.Button addCM_btn;
-        private System.Windows.Forms.Button save_btn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ListView DateListView;
         private System.Windows.Forms.Label label2;
+        private CCWin.SkinControl.SkinButton addCM_btn;
+        private CCWin.SkinControl.SkinButton editCM_btn;
+        private CCWin.SkinControl.SkinButton deleteCM_btn;
+        private CCWin.SkinControl.SkinButton save_btn;
     }
 }

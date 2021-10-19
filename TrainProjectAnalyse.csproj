@@ -73,7 +73,13 @@
     <Compile Include="AnalyseForm.Designer.cs">
       <DependentUpon>AnalyseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="CommandModel.cs" />
+    <Compile Include="NormalCommandModel.cs" />
+    <Compile Include="ConfirmCommand.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfirmCommand.Designer.cs">
+      <DependentUpon>ConfirmCommand.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,6 +97,9 @@
     <Compile Include="TrainModel.cs" />
     <EmbeddedResource Include="AnalyseForm.resx">
       <DependentUpon>AnalyseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfirmCommand.resx">
+      <DependentUpon>ConfirmCommand.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditForm.resx">
       <DependentUpon>EditForm.cs</DependentUpon>

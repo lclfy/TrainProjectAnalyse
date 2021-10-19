@@ -10,7 +10,7 @@ namespace TrainProjectAnalyse
 {
     public partial class AnalyseForm : Skin_Mac
     {
-        List<CommandModel> AllCommands;
+        List<NormalCommandModel> AllCommands;
         string commandText = "";
         //以存储日期+号头确定唯一命令
         string commandID = "";
@@ -19,7 +19,7 @@ namespace TrainProjectAnalyse
         string fileName = "";
         IWorkbook WorkBook;
         string dataFileName = Application.StartupPath + "\\Data.xls";
-        public AnalyseForm(List<CommandModel> _allCM,string _commandText,IWorkbook _wb)
+        public AnalyseForm(List<NormalCommandModel> _allCM,string _commandText,IWorkbook _wb)
         {
             WorkBook = _wb;
             AllCommands = _allCM;
@@ -75,11 +75,11 @@ namespace TrainProjectAnalyse
         {
             this.analysisListView.BeginUpdate();
             //添加数据
-            List<CommandModel> _allCM = AllCommands;
+            List<NormalCommandModel> _allCM = AllCommands;
 
             for (int q = 0; q < _allCM.Count; q++)
             {
-                CommandModel _cm = _allCM[q];
+                NormalCommandModel _cm = _allCM[q];
                 for (int j = 0; j < _cm.allTrainModel.Count; j++)
                 {
                     TrainModel _tm = _cm.allTrainModel[j];
@@ -124,8 +124,8 @@ namespace TrainProjectAnalyse
             this.DateListView.BeginUpdate();
             DateListView.Items.Clear();
             //添加数据
-            List<CommandModel> _allCM = AllCommands;
-            CommandModel _cm = _allCM[titleID];
+            List<NormalCommandModel> _allCM = AllCommands;
+            NormalCommandModel _cm = _allCM[titleID];
             TrainModel _tm = _cm.allTrainModel[selectedID];
             //找到车了，返回这个车，刷新它的时间列表
             foreach(DateTime _dt in _tm.effectiveDates)
@@ -153,49 +153,14 @@ namespace TrainProjectAnalyse
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if(textBox1.Text.Trim().Length == 0)
-            {
-                MessageBox.Show("请输入命令号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                textBox1.Focus();
-            }
-            else
-            {
-                //命令原文存txt
-                string txtFile = "";
-                try
-                {
-                    txtFile = Application.StartupPath + "\\客调命令\\" + DateTime.Now.ToString("yyyyMMdd-") + commandID + ".txt";
-                    fileName = txtFile;
-                    FileStream file = new FileStream(txtFile, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                    StreamWriter writer = new StreamWriter(file);
-                    writer.WriteLine("命令号：" + commandID + "\n\n" + commandText);
-                    writer.Close();
-                    file.Close();
-                }
-                catch (Exception _e)
-                {
 
-                }
-                
-                if(AllCommands.Count == 0)
-                {
-                    MessageBox.Show("未找到车次，命令内容已保存至\n"+txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    saveData();
-                    //返回OK，模型存入excel，回主界面，（主界面重新从excel读取一次数据）
-                    MessageBox.Show("保存成功，命令内容已存储至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                this.Close();
-            }
         }
 
         private void saveData()
         {
             try
             {
-                List<CommandModel> _allCM = AllCommands;
+                List<NormalCommandModel> _allCM = AllCommands;
                 //号头
                 //存储时备份一份
                 IWorkbook workbook = WorkBook;
@@ -276,7 +241,7 @@ namespace TrainProjectAnalyse
                 //找相同车次，若时间有相同，但运行状态不同，则提醒使用新的或保持旧的
                 for(int cmCounter = 0;cmCounter<_allCM.Count;cmCounter++)
                 {
-                    CommandModel _cm = _allCM[cmCounter];
+                    NormalCommandModel _cm = _allCM[cmCounter];
                     bool continueSaveTrain = true;
                     for (int trainCounter = 0; trainCounter < _cm.allTrainModel.Count; trainCounter++)
                     {
@@ -371,13 +336,7 @@ namespace TrainProjectAnalyse
 
         }
 
-        private void addCM_btn_Click(object sender, EventArgs e)
-        {
-            TrainModel _tm = new TrainModel();
-            EditForm _ef = new EditForm(_tm,0);
-            _ef.Owner = this;
-            _ef.Show();
-        }
+
 
         private void EditTrainData()
         {
@@ -395,6 +354,15 @@ namespace TrainProjectAnalyse
         public void EditComplete(TrainModel _tm,int newOrEdit)
         {
             TrainModel trainModel = _tm;
+            if(AllCommands.Count == 0)
+            {
+                NormalCommandModel _cm = new NormalCommandModel();
+                _cm.createTime = DateTime.Now;
+                _cm.commandID = commandID;
+                AllCommands.Add(_cm);
+            }
+            AllCommands[0].allTrainModel.Add(trainModel);
+            RefreshData();
             int a = 9;
         }
 
@@ -411,6 +379,67 @@ namespace TrainProjectAnalyse
         private void analysisListView_DoubleClick(object sender, EventArgs e)
         {
             EditTrainData();
+        }
+
+        private void save_btn_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("请输入命令号", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                textBox1.Focus();
+            }
+            else
+            {
+                //命令原文存txt
+                string txtFile = "";
+                try
+                {
+                    txtFile = Application.StartupPath + "\\客调命令\\" + DateTime.Now.ToString("yyyyMMdd-") + commandID + ".txt";
+                    fileName = txtFile;
+                    FileStream file = new FileStream(txtFile, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                    StreamWriter writer = new StreamWriter(file);
+                    if(commandText.Trim().Length != 0)
+                    {
+                        writer.WriteLine("命令号：" + commandID + "\n\n" + commandText);
+                    }
+                    else
+                    {
+                        writer.WriteLine("命令号：" + commandID + "\n\n" + "该命令车次为人工添加，无命令内容，可双击打开粘贴命令内容");
+                    }
+
+                    writer.Close();
+                    file.Close();
+                }
+                catch (Exception _e)
+                {
+
+                }
+
+                if (AllCommands.Count == 0)
+                {
+                    MessageBox.Show("未找到车次，命令内容已保存至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    saveData();
+                    //返回OK，模型存入excel，回主界面，（主界面重新从excel读取一次数据）
+                    MessageBox.Show("保存成功，命令内容已存储至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                this.Close();
+            }
+        }
+
+        private void addCM_btn_Click_1(object sender, EventArgs e)
+        {
+            TrainModel _tm = new TrainModel();
+            EditForm _ef = new EditForm(_tm, 0);
+            _ef.Owner = this;
+            _ef.Show();
+        }
+
+        private void deleteCM_btn_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

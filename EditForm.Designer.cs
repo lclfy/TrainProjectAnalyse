@@ -361,6 +361,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
+            this.BorderColor = System.Drawing.Color.White;
+            this.CaptionBackColorBottom = System.Drawing.Color.White;
+            this.CaptionBackColorTop = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(635, 450);
             this.Controls.Add(this.closeForm_btn);
             this.Controls.Add(this.save_btn);

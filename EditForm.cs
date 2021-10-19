@@ -234,12 +234,23 @@ namespace TrainProjectAnalyse
                 MessageBox.Show("请选择正确的连续日期", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            while (time1 <= time2.AddDays(1) && time1.Year > 1990)
+            else if (time1.Date == time2.Date)
             {
-                allDates = allDates + time1.ToShortDateString()+"\n";
+                allDates = allDates + time1.ToShortDateString() + "\n";
                 li.Add(time1);
                 time1 = time1.AddDays(1);
             }
+            else
+            {
+                while (time1 <= time2.AddDays(1) && time1.Year > 1990 && time1 != time2)
+                {
+                    allDates = allDates + time1.ToShortDateString() + "\n";
+                    li.Add(time1);
+                    time1 = time1.AddDays(1);
+                }
+            }
+
+
             if(MessageBox.Show("要添加的日期为：\n"+allDates+"是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
             {
                 //判断是否有重复日期
@@ -276,7 +287,7 @@ namespace TrainProjectAnalyse
         {
             //添加单一日期
             DateTime _date = addSingleTime_dtp.Value;
-            if (MessageBox.Show("要添加的日期为：\n" + _date.ToShortDateString() + "是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+            if (MessageBox.Show("要添加的日期为：\n" + _date.ToShortDateString() + "\n是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
             {
                 //判断是否有重复日期
                 string sameDates = "";

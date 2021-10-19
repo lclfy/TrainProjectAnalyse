@@ -23,3 +23,4 @@ Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProje
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.pdb
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.AnalyseForm.resources
 Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.EditForm.resources
+Y:\Documents\GitHub\TrainProjectAnalyse\TrainProjectAnalyse\obj\Debug\TrainProjectAnalyse.ConfirmCommand.resources

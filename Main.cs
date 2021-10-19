@@ -3,6 +3,7 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -12,10 +13,10 @@ namespace TrainProjectAnalyse
     public partial class Main : Skin_Mac
     {
         //Excel内的命令
-        List<CommandModel> allCurrentModels;
+        List<NormalCommandModel> allCurrentModels;
         List<TrainModel> allCurrentTrainModels;
         //新添加的命令
-        List<CommandModel> allCommands;
+        List<NormalCommandModel> allCommands;
         string commandText = "";
         IWorkbook WorkBook;
 
@@ -32,12 +33,77 @@ namespace TrainProjectAnalyse
             {
                 loadData();
             }
+            RefreshCommandList();
+        }
+
+        //刷新总表
+        private void RefreshCommandList()
+        {
+            //先刷新总列表，以命令名为group名，group内为命令里的车
+            commandListView.View = View.Details;
+            commandListView.ShowGroups = true;
+            string[] commandListViewTitle = new string[] { "车次", "运行信息","命令详情" };
+            for (int i = 0; i < commandListViewTitle.Length; i++)
+            {
+                ColumnHeader ch = new ColumnHeader();
+                ch.Text = commandListViewTitle[i];   //设置列标题 
+                ch.Width = 80;
+                this.commandListView.Columns.Add(ch);    //将列头添加到ListView控件。
+            }
+            this.commandListView.BeginUpdate();
+
+            //添加数据
+            List<NormalCommandModel> _allCM = allCurrentModels;
+            List<TrainModel> _allTM = allCurrentTrainModels;
+
+            for (int q = 0; q < _allCM.Count; q++)
+            {
+                //以命令名作为组名，组内放车
+                ListViewGroup _tempGroup = new ListViewGroup(_allCM[q].commandID);
+                for (int j = 0; j < _allTM.Count; j++)
+                {
+                    if (_allTM[j].commandID.Trim().Equals(_allCM[q].commandID))
+                    {
+                        TrainModel _tm = _allTM[j];
+                        ListViewItem item = new ListViewItem();
+                        string trainNum = _tm.firstTrainNum;
+                        if (_tm.secondTrainNum.Trim().Length != 0)
+                        {
+                            trainNum = trainNum + "/" + _tm.secondTrainNum;
+                        }
+                        item.SubItems[0].Text = trainNum;
+                        //0停运，1恢复开行，-1未定义
+                        if (_tm.streamStatus == 0)
+                        {
+                            item.SubItems.Add("停运");
+                        }
+                        else if (_tm.streamStatus == 1)
+                        {
+                            item.SubItems.Add("恢复开行");
+                        }
+                        else if (_tm.streamStatus == -1)
+                        {
+                            item.SubItems.Add("未找到");
+                        }
+                        item.SubItems.Add("单击显示");
+                        this.commandListView.Groups.Add(_tempGroup);
+                        item.Group = commandListView.Groups[q];
+                        commandListView.Items.Add(item);
+                        //_tempGroup.Items.Add(item);
+
+                    }
+                }
+            }
+            ImageList imgList = new ImageList();
+            imgList.ImageSize = new Size(1, 20);// 设置行高 20 //分别是宽和高 
+            commandListView.SmallImageList = imgList; //这里设置listView的SmallImageList ,用imgList将其撑大 
+            this.commandListView.EndUpdate();
         }
 
         private void refreshData()
         {
-            allCommands = new List<CommandModel>();
-            allCurrentModels = new List<CommandModel>();
+            allCommands = new List<NormalCommandModel>();
+            allCurrentModels = new List<NormalCommandModel>();
             allCurrentTrainModels = new List<TrainModel>();
         }
 
@@ -47,7 +113,7 @@ namespace TrainProjectAnalyse
             ISheet sheetCommands = WorkBook.GetSheet("Commands");
             ISheet sheetTrains = WorkBook.GetSheet("Trains");
             bool titleRow = true;
-            foreach(IRow row in sheetCommands)
+            foreach(IRow row in sheetCommands) 
             {
                 //首行跳过
                 if (titleRow)
@@ -55,7 +121,7 @@ namespace TrainProjectAnalyse
                     titleRow = false;
                     continue;
                 }
-                CommandModel _cm = new CommandModel();
+                NormalCommandModel _cm = new NormalCommandModel();
                 if (row.GetCell(0) != null)
                 {
                     _cm.createTime = DateTime.Parse(row.GetCell(0).ToString());
@@ -201,11 +267,11 @@ namespace TrainProjectAnalyse
                 splitedCommandText[sentence] = splitedCommandText[sentence].Replace("命令来源", "").Replace("命令外发", "");
             }
             //对每条命令进行从左至右读取
-            List<CommandModel> _allCM = new List<CommandModel>();
+            List<NormalCommandModel> _allCM = new List<NormalCommandModel>();
 
             for (int count = 0; count < splitedCommandText.Length; count++)
             {
-                CommandModel _cm = new CommandModel();
+                NormalCommandModel _cm = new NormalCommandModel();
                 //当出现“停运”，“恢复开行”时，将前面的全部存起来
                 string currentYear = "";
                 string currentMonth = "";
@@ -446,7 +512,7 @@ namespace TrainProjectAnalyse
                         currentTrainNumber = new List<string>();
                         _tempModels = new List<TrainModel>();
                         _allCM.Add(_cm);
-                        _cm = new CommandModel();
+                        _cm = new NormalCommandModel();
                     }
                 }
             }
@@ -534,19 +600,52 @@ namespace TrainProjectAnalyse
 
             if (isHighSpeedCommand)
             {
-                getCommands_HighSpeed(richTextBox1.Text);
+                getCommands_HighSpeed(command_rtb.Text);
             }
             else
             {
-                getCommands(richTextBox1.Text);
-                commandText = richTextBox1.Text;
+                getCommands(command_rtb.Text);
+                commandText = command_rtb.Text;
+                if (allCommands.Count == 0)
+                {
+                    edit_btn.Enabled = false;
+                }
+                else
+                {
+                    edit_btn.Enabled = true;
+                }
             }
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            AnalyseForm _af = new AnalyseForm(allCommands,commandText,WorkBook);
+            if(allCommands.Count != 0)
+            {
+                AnalyseForm _af = new AnalyseForm(allCommands, commandText, WorkBook);
+                _af.Owner = this;
+                _af.Show();
+            }
+        }
+
+        private void commandListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox2_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void addCommandManually_btn_Click(object sender, EventArgs e)
+        {
+            AnalyseForm _af = new AnalyseForm(new List<NormalCommandModel>(), commandText, WorkBook);
             _af.Owner = this;
             _af.Show();
         }
