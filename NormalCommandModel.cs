@@ -11,12 +11,17 @@ namespace TrainProjectAnalyse
         public List<TrainModel> allTrainModel { get; set; }
         public string fileName { get; set; }
 
+        //列车ID，为日期+命令号
+        //2021102051034
+        public string ID { get; set; }
+
         public NormalCommandModel()
         {
             createTime = DateTime.Now;
             commandID = "";
             allTrainModel = new List<TrainModel>();
             fileName = "";
+            ID = createTime.ToString("yyyyMMdd");
         }
     }
 }

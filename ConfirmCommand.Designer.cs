@@ -86,6 +86,7 @@
             this.groupBox1.Controls.Add(this.search_tb);
             this.groupBox1.Controls.Add(this.mainList);
             this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox1.ForeColor = System.Drawing.SystemColors.Highlight;
             this.groupBox1.Location = new System.Drawing.Point(209, 74);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(390, 483);
@@ -130,6 +131,7 @@
             // 
             this.groupBox2.Controls.Add(this.originalText_rtb);
             this.groupBox2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox2.ForeColor = System.Drawing.SystemColors.Highlight;
             this.groupBox2.Location = new System.Drawing.Point(740, 74);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(359, 483);
@@ -149,6 +151,7 @@
             // 
             this.groupBox3.Controls.Add(this.commandID_list);
             this.groupBox3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox3.ForeColor = System.Drawing.SystemColors.Highlight;
             this.groupBox3.Location = new System.Drawing.Point(605, 74);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(129, 483);
@@ -181,6 +184,7 @@
             this.groupBox4.Controls.Add(this.importTimeTable_btn);
             this.groupBox4.Controls.Add(this.highSpeedCommand_rtb);
             this.groupBox4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox4.ForeColor = System.Drawing.SystemColors.MenuHighlight;
             this.groupBox4.Location = new System.Drawing.Point(26, 74);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(177, 483);
@@ -204,7 +208,7 @@
             this.importTimeTable_btn.NormlBack = null;
             this.importTimeTable_btn.Size = new System.Drawing.Size(161, 50);
             this.importTimeTable_btn.TabIndex = 38;
-            this.importTimeTable_btn.Text = "更新列车运行信息";
+            this.importTimeTable_btn.Text = "更新列车运行计划";
             this.importTimeTable_btn.UseVisualStyleBackColor = false;
             // 
             // highSpeedCommand_rtb

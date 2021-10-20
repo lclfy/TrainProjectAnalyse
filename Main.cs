@@ -18,6 +18,8 @@ namespace TrainProjectAnalyse
         //新添加的命令
         List<NormalCommandModel> allCommands;
         string commandText = "";
+        //避免重复打开txt文件，只在变化时打开
+        string currentTXTFileName = "";
         IWorkbook WorkBook;
 
         public Main()
@@ -27,29 +29,66 @@ namespace TrainProjectAnalyse
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            edit_btn.Enabled = false;
+            RefreshUI();
+            today_rb.Select();
+        }
+
+        //刷新内容
+        public void RefreshUI()
+        {
+
             refreshData();
             WorkBook = loadExcel();
-            if(WorkBook != null)
+            if (WorkBook != null)
             {
                 loadData();
             }
+            initList();
             RefreshCommandList();
+        }
+
+        private void initList()
+        {
+            DateListView.View = View.Details;
+            DateListView.ShowGroups = false;
+            string[] dateListViewTitle = new string[] { "日期" };
+            for (int i = 0; i < dateListViewTitle.Length; i++)
+            {
+                ColumnHeader ch = new ColumnHeader();
+                ch.Text = dateListViewTitle[i];   //设置列标题 
+                ch.Width = 130;
+                DateListView.FullRowSelect = true;
+                this.DateListView.Columns.Add(ch);    //将列头添加到ListView控件。
+            }
+
+            commandListView.View = View.Details;
+            commandListView.ShowGroups = true;
+            string[] commandListViewTitle = new string[] { "车次", "运行信息", "日期与命令" };
+            for (int i = 0; i < commandListViewTitle.Length; i++)
+            {
+                ColumnHeader ch = new ColumnHeader();
+                ch.Text = commandListViewTitle[i];   //设置列标题 
+                if(i == 0 || i == 2)
+                {
+                    ch.Width = 90;
+                }
+                else if(i == 1)
+                {
+                    ch.Width = 70;
+                }
+
+                this.commandListView.Columns.Add(ch);    //将列头添加到ListView控件。
+            }
         }
 
         //刷新总表
         private void RefreshCommandList()
         {
             //先刷新总列表，以命令名为group名，group内为命令里的车
-            commandListView.View = View.Details;
-            commandListView.ShowGroups = true;
-            string[] commandListViewTitle = new string[] { "车次", "运行信息","命令详情" };
-            for (int i = 0; i < commandListViewTitle.Length; i++)
-            {
-                ColumnHeader ch = new ColumnHeader();
-                ch.Text = commandListViewTitle[i];   //设置列标题 
-                ch.Width = 80;
-                this.commandListView.Columns.Add(ch);    //将列头添加到ListView控件。
-            }
+            commandListView.Items.Clear();
+            commandListView.Groups.Clear();
+        
             this.commandListView.BeginUpdate();
 
             //添加数据
@@ -58,11 +97,12 @@ namespace TrainProjectAnalyse
 
             for (int q = 0; q < _allCM.Count; q++)
             {
-                //以命令名作为组名，组内放车
-                ListViewGroup _tempGroup = new ListViewGroup(_allCM[q].commandID);
+                //以"[命令名]-日期shortdate"作为组名，组内放车
+                ListViewGroup _tempGroup = new ListViewGroup("["+_allCM[q].commandID+"]-"+_allCM[q].createTime.ToShortDateString());
                 for (int j = 0; j < _allTM.Count; j++)
                 {
-                    if (_allTM[j].commandID.Trim().Equals(_allCM[q].commandID))
+                    if (_allTM[j].commandID.Trim().Equals(_allCM[q].commandID) &&
+                        _allTM[j].createTime.ToShortDateString().Equals(_allCM[q].createTime.ToShortDateString()))
                     {
                         TrainModel _tm = _allTM[j];
                         ListViewItem item = new ListViewItem();
@@ -86,14 +126,18 @@ namespace TrainProjectAnalyse
                             item.SubItems.Add("未找到");
                         }
                         item.SubItems.Add("单击显示");
+                        
                         this.commandListView.Groups.Add(_tempGroup);
                         item.Group = commandListView.Groups[q];
                         commandListView.Items.Add(item);
+                        //在此处把车和命令匹配在一起，变更任意一个都会变更两个项目
+                        _allCM[q].allTrainModel.Add(_allTM[j]);
                         //_tempGroup.Items.Add(item);
 
                     }
                 }
             }
+            allCurrentModels = _allCM;
             ImageList imgList = new ImageList();
             imgList.ImageSize = new Size(1, 20);// 设置行高 20 //分别是宽和高 
             commandListView.SmallImageList = imgList; //这里设置listView的SmallImageList ,用imgList将其撑大 
@@ -145,6 +189,10 @@ namespace TrainProjectAnalyse
                 else
                 {
                     _cm.fileName = "";
+                }
+                if (row.GetCell(3) != null)
+                {
+                    _cm.ID = row.GetCell(3).ToString();
                 }
                 allCurrentModels.Add(_cm);
             }
@@ -219,6 +267,10 @@ namespace TrainProjectAnalyse
                 else
                 {
                     _tm.effectiveDates = null;
+                }
+                if(row.GetCell(7) != null)
+                {
+                    _tm.ID = row.GetCell(7).ToString();
                 }
                 allCurrentTrainModels.Add(_tm);
             }
@@ -613,7 +665,11 @@ namespace TrainProjectAnalyse
                 else
                 {
                     edit_btn.Enabled = true;
+                    //复制完后从最上面开始显示
+                    this.command_rtb.Select(0, 0);
+                    command_rtb.ScrollToCaret();
                 }
+
             }
 
         }
@@ -622,15 +678,136 @@ namespace TrainProjectAnalyse
         {
             if(allCommands.Count != 0)
             {
-                AnalyseForm _af = new AnalyseForm(allCommands, commandText, WorkBook);
+                //最后参数为1则为编辑现有命令模式，为0为添加命令模式
+                AnalyseForm _af = new AnalyseForm(allCommands, commandText, WorkBook,0);
                 _af.Owner = this;
                 _af.Show();
             }
         }
 
+        //打开原文
+        private void OpenOriginalCommand(string fileName)
+        {
+            try
+            {
+                if(fileName.Length != 0)
+                {
+                    System.Diagnostics.Process.Start("NotePad", fileName);
+                    currentTXTFileName = fileName;
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+
+        }
+
+        //找出命令原文
+        private void ReadOriginalCommand(string fileName)
+        {
+            try
+            {
+                // 创建一个 StreamReader 的实例来读取文件 
+                // using 语句也能关闭 StreamReader
+                if (!fileName.Equals(currentTXTFileName))
+                {
+                    currentTXTFileName = fileName;
+                    using (StreamReader sr = new StreamReader(fileName))
+                    {
+                        string line = "";
+                        line = line + sr.ReadLine();
+                        OriginalText_rtb.Text = line;
+                        string current;
+                        // 从文件读取并显示行，直到文件的末尾
+                        while ((current = sr.ReadLine()) != null)
+                        {
+                            line = line + current + "\n";
+                            OriginalText_rtb.Text = line.Trim();
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                // 向用户显示出错消息
+                OriginalText_rtb.Text = "未找到命令原文";
+            }
+        }
+
+        //从选中的项目中找对应的命令对象
+        private NormalCommandModel  GetCommandFromSelect(string commandIDAndDate)
+        {
+            NormalCommandModel _tempCM = new NormalCommandModel();
+            string commandID = commandIDAndDate.Split(']')[0].Replace("[","");
+            string createDate = commandIDAndDate.Split('-')[1];
+            //遍历日期和命令号都符合的命令
+            foreach(NormalCommandModel _cm in allCurrentModels)
+            {
+                //找到了命令
+                if(_cm.commandID.Equals(commandID) && _cm.createTime.ToShortDateString().Equals(createDate))
+                {
+                    _tempCM = _cm;
+                }
+            }
+            return _tempCM;
+        }
+
+        //从选中的项目中获取列车信息
+        private TrainModel GetTrainFromSelect(NormalCommandModel _tempCM,string trainNumber)
+        {
+            //由于前期已经将车次和命令匹配了，所以只需要有命令就可以找到车次
+            //注意车次需分开
+            TrainModel _tempTM = new TrainModel();
+            string firstTrainNum = "";
+            string secondTrainNum = "";
+            firstTrainNum = trainNumber.Split('/')[0];
+            if (trainNumber.Contains("/"))
+            {
+                secondTrainNum = trainNumber.Split('/')[1];
+            }
+            foreach(TrainModel _tm in _tempCM.allTrainModel)
+            {
+                //找到了
+                if(_tm.firstTrainNum.Equals(firstTrainNum)||
+                    _tm.secondTrainNum.Equals(firstTrainNum)||
+                    _tm.firstTrainNum.Equals(secondTrainNum)||
+                    _tm.secondTrainNum.Equals(secondTrainNum))
+                {
+                    _tempTM = _tm;
+                }
+            }
+            return _tempTM;
+        }
+
+        //填充时间
+        private void RefreshDateList(TrainModel _tm)
+        {
+            DateListView.BeginUpdate();
+            DateListView.Items.Clear();
+            foreach (DateTime _dt in _tm.effectiveDates)
+            {
+                ListViewItem item = new ListViewItem();
+                item.SubItems[0].Text = _dt.ToLongDateString();
+                DateListView.Items.Add(item);
+            }
+            DateListView.EndUpdate();
+        }
+
+
         private void commandListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (commandListView.SelectedItems.Count != 0)
+            {
+                //get命令的信息
+                NormalCommandModel _tempCM = GetCommandFromSelect(commandListView.SelectedItems[0].Group.Header);
+                ReadOriginalCommand(_tempCM.fileName);
+                TrainModel _tempTM = GetTrainFromSelect(_tempCM,commandListView.SelectedItems[0].SubItems[0].Text);
+                //填充时间
+                RefreshDateList(_tempTM);
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -645,9 +822,52 @@ namespace TrainProjectAnalyse
 
         private void addCommandManually_btn_Click(object sender, EventArgs e)
         {
-            AnalyseForm _af = new AnalyseForm(new List<NormalCommandModel>(), commandText, WorkBook);
+            //最后参数为1则为编辑命令模式，为0为添加命令模式
+            AnalyseForm _af = new AnalyseForm(new List<NormalCommandModel>(), commandText, WorkBook,0);
             _af.Owner = this;
             _af.Show();
+        }
+
+        private void OriginalText_rtb_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        //双击打开原文
+        private void OriginalText_rtb_DoubleClick(object sender, EventArgs e)
+        {
+            if (commandListView.SelectedItems.Count != 0)
+            {
+                //get命令的信息
+                NormalCommandModel _tempCM = GetCommandFromSelect(commandListView.SelectedItems[0].Group.Header);
+                OpenOriginalCommand(_tempCM.fileName);
+            }
+        }
+
+        //编辑命令
+        private void EditSelectedCommand_btn_Click(object sender, EventArgs e)
+        {
+            if (commandListView.SelectedItems.Count != 0)
+            {
+                NormalCommandModel _tempCM = GetCommandFromSelect(commandListView.SelectedItems[0].Group.Header);
+                List<NormalCommandModel> _listCM = new List<NormalCommandModel>();
+                _listCM.Add(_tempCM);
+                //最后参数为1则为编辑命令模式，为0为添加命令模式
+                AnalyseForm _af = new AnalyseForm(_listCM, commandText, WorkBook,1);
+                _af.Owner = this;
+                _af.Show();
+            }
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void searchTrain_tb_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

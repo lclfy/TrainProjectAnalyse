@@ -14,15 +14,19 @@ namespace TrainProjectAnalyse
         string commandText = "";
         //以存储日期+号头确定唯一命令
         string commandID = "";
-        string nowDate = DateTime.Now.ToString("yyyy-MM-dd");
+        string nowDate = DateTime.Now.ToShortDateString();
         //存储的文件名
         string fileName = "";
         IWorkbook WorkBook;
+        //0为新增命令模式，1为修改现有命令模式，增加删除命令按钮和功能
+        int EditMode;
         string dataFileName = Application.StartupPath + "\\Data.xls";
-        public AnalyseForm(List<NormalCommandModel> _allCM,string _commandText,IWorkbook _wb)
+        public AnalyseForm(List<NormalCommandModel> _allCM,string _commandText,IWorkbook _wb,int _editMode)
         {
+            //EditMode为0则为新增命令，为1则为编辑现有命令
             WorkBook = _wb;
             AllCommands = _allCM;
+            EditMode = _editMode;
             commandText = _commandText;
             InitializeComponent();
         }
@@ -49,7 +53,7 @@ namespace TrainProjectAnalyse
                 }
                 else
                 {
-                    ch.Width = 70;
+                    ch.Width = 80;
                 }
 
                 this.analysisListView.Columns.Add(ch);    //将列头添加到ListView控件。
@@ -73,6 +77,7 @@ namespace TrainProjectAnalyse
 
         private void RefreshData()
         {
+            analysisListView.Items.Clear();
             this.analysisListView.BeginUpdate();
             //添加数据
             List<NormalCommandModel> _allCM = AllCommands;
@@ -156,7 +161,7 @@ namespace TrainProjectAnalyse
 
         }
 
-        private void saveData()
+        private int saveData()
         {
             try
             {
@@ -167,10 +172,154 @@ namespace TrainProjectAnalyse
 
                 ISheet sheetCommand = workbook.GetSheet("Commands");
                 ISheet sheetTrain = workbook.GetSheet("Trains");
-
-                //先存命令表
-                //遇到重复号头时，是否继续保存
+                //命令表是否保存，0不保存，1保存，2遇到当日重复文件，不保存txt
                 int continueSave = -1;
+
+                //存列车表(列车表优先级高，列车表不存了命令表也不存了)
+                //先检索一遍有没有冲突情况
+                //找相同车次，若时间有相同，但运行状态不同，则提醒使用新的或保持旧的
+                //车次的ID
+                int IDCounter = 1;
+                for (int cmCounter = 0; cmCounter < _allCM.Count; cmCounter++)
+                {
+                    NormalCommandModel _cm = _allCM[cmCounter];
+                    bool continueSaveTrain = true;
+                    string modelID = _cm.ID + commandID;
+                    _cm.commandID = commandID;
+                    _cm.ID = modelID;
+
+                    for (int trainCounter = 0; trainCounter < _cm.allTrainModel.Count; trainCounter++)
+                    {
+                        TrainModel _tm = _cm.allTrainModel[trainCounter];
+                        //_tm.ID = commandID;
+                        _tm.ID += commandID + IDCounter.ToString("D3");
+                        IDCounter++;
+                        foreach (IRow row in sheetTrain)
+                        {
+                            if (row != null)
+                            {
+                                //车次为null的新建
+                                if (row.GetCell(3) == null)
+                                {
+                                    row.CreateCell(3);
+                                }
+                                if (row.GetCell(4) == null)
+                                {
+                                    row.CreateCell(4);
+                                }
+                                string fir = row.GetCell(3).ToString();
+                                string sec = row.GetCell(4).ToString();
+                                if ((fir.Trim().Equals(_tm.firstTrainNum) ||
+                                    fir.Trim().Equals(_tm.secondTrainNum) ||
+                                    sec.Trim().Equals(_tm.firstTrainNum) ||
+                                    sec.Trim().Equals(_tm.secondTrainNum))&&
+                                    fir.Trim().Length!=0&&sec.Trim().Length!=0&&
+                                    _tm.firstTrainNum.Trim().Length!=0&&
+                                    _tm.secondTrainNum.Trim().Length!=0)
+                                {
+                                    //有重复的，找时间是否有相同的
+                                    //有相同的问是否保存
+                                    ICell cell = row.GetCell(6);
+                                    bool hasGotSameTime = false;
+                                    string sameDateList = "";
+                                    foreach (DateTime _dt in _tm.effectiveDates)
+                                    {
+                                        //有日期交叉
+                                        string[] allDates = cell.ToString().Split(',');
+                                        if(allDates.Length != 0)
+                                        {
+                                            for(int ij = 0; ij < allDates.Length; ij++)
+                                            {
+                                                DateTime _targetDate = DateTime.Parse(allDates[ij]);
+                                                if (_targetDate.Year.Equals(_dt.Year)&&
+                                                    _targetDate.Month.Equals(_dt.Month) &&
+                                                    _targetDate.Day.Equals(_dt.Day) )
+                                                {
+                                                    sameDateList = sameDateList + _dt.ToShortDateString() + "\n";
+                                                    hasGotSameTime = true;
+                                                }
+                                            }
+
+                                        }
+                             
+                                    }
+                                    if(hasGotSameTime)
+                                    {
+                                        string previousDate = "";
+                                        if (row.GetCell(0) != null)
+                                        {
+                                            if (row.GetCell(1) == null)
+                                            {
+                                                row.GetCell(1).SetCellValue(" ");
+                                            }
+                                            previousDate = row.GetCell(0).ToString().Trim();
+                                            DialogResult dr;
+
+                                            //if(previousDate)
+                                            dr = MessageBox.Show("您于" + previousDate + "添加的" + row.GetCell(1).ToString() + "命令中，\n" +
+                                                "与当前命令存在车次时间交叉冲突，\n" +
+                                                "车次：" + _tm.firstTrainNum +
+                                                "\n日期：\n" + sameDateList +
+                                                "点击确定将继续添加车次，取消则停止", "提醒", MessageBoxButtons.YesNo,
+                                                     MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                                            if (dr == DialogResult.Yes)
+                                            {
+                                                //开始储存
+                                                continueSaveTrain = true;
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                continueSaveTrain = false;
+                                                continueSave = 0;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    //continueSaveTrain = false;
+                                }
+                            }
+                        }
+
+                    }
+                    //继续保存
+                    //
+                    //
+                    //此时如果是编辑新表，则是查找后更改内容
+                    //
+                    //
+                    if (continueSaveTrain)
+                    {
+                        int lastRowTrain = sheetTrain.LastRowNum;
+                        for (int counter = 0; counter < _cm.allTrainModel.Count; counter++)
+                        {
+                            TrainModel _tm = _cm.allTrainModel[counter];
+                            IRow row = sheetTrain.CreateRow(lastRowTrain + counter + 1);
+                            row.CreateCell(0).SetCellValue(_tm.createTime.ToShortDateString());
+                            row.CreateCell(1).SetCellValue(commandID);
+                            row.CreateCell(2).SetCellValue(cmCounter);
+                            row.CreateCell(3).SetCellValue(_tm.firstTrainNum);
+                            row.CreateCell(4).SetCellValue(_tm.secondTrainNum);
+                            row.CreateCell(5).SetCellValue(_tm.streamStatus);
+                            //日期格式yyyy/MM/dd，以英文逗号区分
+                            string dateStr = "";
+                            foreach (DateTime _dt in _tm.effectiveDates)
+                            {
+                                dateStr += _dt.ToString("yyyy/MM/dd") + ",";
+                            }
+                            dateStr = dateStr.TrimEnd(',');
+                            row.CreateCell(6).SetCellValue(dateStr);
+                            row.CreateCell(7).SetCellValue(_tm.ID);
+                        }
+                    }
+                    
+                }
+
+                //存命令表
+                //遇到重复号头时，是否继续保存
+
+                bool hasSameCommand = false;
                 foreach(IRow row in sheetCommand)
                 {
                     if(row == null)
@@ -187,11 +336,19 @@ namespace TrainProjectAnalyse
                         if(cell.ToString().Trim().Equals(commandID))
                         {
                             string previousDate = "";
-                            if(row.GetCell(i+1) != null)
+                            if(row.GetCell(i-1) != null)
                             {
-                                previousDate = row.GetCell(i + 1).ToString().Trim();
+                                previousDate = row.GetCell(i - 1).ToString().Trim();
                                 //出现同名命令，是否覆盖
                                 DialogResult dr;
+                                //如果同一天添加了两次相同命令，则不存储CommandModel，避免重复
+                                //同时写continuesave = 2，保存时不保存txt
+                                if (previousDate.Equals(DateTime.Now.ToShortDateString()))
+                                {
+                                    hasSameCommand = true;
+                                }
+
+                                //if(previousDate)
                                 dr = MessageBox.Show("您已于"+previousDate+"添加过号头为"+commandID+"的调度命令\n"+
                                     "点击“确定”将继续添加该命令", "提醒", MessageBoxButtons.YesNo,
                                          MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
@@ -199,6 +356,7 @@ namespace TrainProjectAnalyse
                                 {
                                     //开始储存
                                     continueSave = 1;
+                                    break;
                                 }
                                 else
                                 {
@@ -215,106 +373,50 @@ namespace TrainProjectAnalyse
                 }
                 if(continueSave == 0)
                 {
-                    return;
+                    return 0;
                 }
-                int lastRow = sheetCommand.LastRowNum;
+                if (!hasSameCommand)
                 {
-                    //在最后一行的下一行开始填写
-                    int currentRowNumber = 1 + lastRow ;
+                    int lastRow = sheetCommand.LastRowNum;
                     {
-                        if (sheetCommand.GetRow(currentRowNumber) == null)
+                        //在最后一行的下一行开始填写
+                        int currentRowNumber = 1 + lastRow;
                         {
-                            sheetCommand.CreateRow(currentRowNumber);
-                        }
-                        IRow row = sheetCommand.GetRow(currentRowNumber);
-                        ICell cellDate = row.CreateCell(0);
-                        cellDate.SetCellValue(nowDate);
-                        ICell cellNumber = row.CreateCell(1);
-                        cellNumber.SetCellValue(commandID);
-                        ICell cellFileName = row.CreateCell(2);
-                        cellFileName.SetCellValue(fileName);
-                    }
-                }
-
-                //存列车表
-                //先检索一遍有没有冲突情况
-                //找相同车次，若时间有相同，但运行状态不同，则提醒使用新的或保持旧的
-                for(int cmCounter = 0;cmCounter<_allCM.Count;cmCounter++)
-                {
-                    NormalCommandModel _cm = _allCM[cmCounter];
-                    bool continueSaveTrain = true;
-                    for (int trainCounter = 0; trainCounter < _cm.allTrainModel.Count; trainCounter++)
-                    {
-                        TrainModel _tm = _cm.allTrainModel[trainCounter];
-
-                        foreach (IRow row in sheetTrain)
-                        {
-                            if (row != null)
+                            if (sheetCommand.GetRow(currentRowNumber) == null)
                             {
-                                //车次为null的新建
-                                if (row.GetCell(3) == null)
-                                {
-                                    row.CreateCell(3);
-                                }
-                                if (row.GetCell(4) == null)
-                                {
-                                    row.CreateCell(4);
-                                }
-                                if (row.GetCell(3).ToString().Trim().Equals(_tm.firstTrainNum)||
-                                    row.GetCell(3).ToString().Trim().Equals(_tm.secondTrainNum)||
-                                    row.GetCell(4).ToString().Trim().Equals(_tm.firstTrainNum)||
-                                    row.GetCell(4).ToString().Trim().Equals(_tm.secondTrainNum))
-                                {
-                                    //有重复的，找时间是否有相同的
-                                    //这里还没来得及写
-
-                                    //continueSaveTrain = false;
-                                }
+                                sheetCommand.CreateRow(currentRowNumber);
                             }
-                        }
-
-                    }
-                    //继续保存
-                    if (continueSaveTrain)
-                    {
-                        int lastRowTrain = sheetTrain.LastRowNum;
-                        for (int counter = 0; counter < _cm.allTrainModel.Count; counter++)
-                        {
-                            TrainModel _tm = _cm.allTrainModel[counter];
-                            IRow row = sheetTrain.CreateRow(lastRowTrain + counter + 1);
-                            row.CreateCell(0).SetCellValue(_tm.createTime.ToString("yyyy/MM/dd"));
-                            row.CreateCell(1).SetCellValue(commandID);
-                            row.CreateCell(2).SetCellValue(cmCounter);
-                            row.CreateCell(3).SetCellValue(_tm.firstTrainNum);
-                            row.CreateCell(4).SetCellValue(_tm.secondTrainNum);
-                            row.CreateCell(5).SetCellValue(_tm.streamStatus);
-                            //日期格式yyyy/MM/dd，以英文逗号区分
-                            string dateStr = "";
-                            foreach (DateTime _dt in _tm.effectiveDates)
-                            {
-                                dateStr += _dt.ToString("yyyy/MM/dd") + ",";
-                            }
-                            dateStr = dateStr.TrimEnd(',');
-                            row.CreateCell(6).SetCellValue(dateStr);
+                            IRow row = sheetCommand.GetRow(currentRowNumber);
+                            ICell cellDate = row.CreateCell(0);
+                            cellDate.SetCellValue(nowDate);
+                            ICell cellNumber = row.CreateCell(1);
+                            cellNumber.SetCellValue(commandID);
+                            ICell cellFileName = row.CreateCell(2);
+                            cellFileName.SetCellValue(fileName);
+                            ICell cellID = row.CreateCell(3);
+                            cellID.SetCellValue(_allCM[0].ID);
                         }
                     }
                 }
+  
+
                 //重新修改文件指定单元格样式
                 FileStream fs1 = File.OpenWrite(dataFileName);
                 workbook.Write(fs1);
                 fs1.Close();
                 Console.ReadLine();
                 workbook.Close();
-
+                if (hasSameCommand)
+                {
+                    continueSave = 2;
+                }
+                return continueSave;
             }
             catch(Exception e)
             {
 
             }
-
-
-
-
+            return 0;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -390,42 +492,58 @@ namespace TrainProjectAnalyse
             }
             else
             {
-                //命令原文存txt
                 string txtFile = "";
-                try
-                {
-                    txtFile = Application.StartupPath + "\\客调命令\\" + DateTime.Now.ToString("yyyyMMdd-") + commandID + ".txt";
-                    fileName = txtFile;
-                    FileStream file = new FileStream(txtFile, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                    StreamWriter writer = new StreamWriter(file);
-                    if(commandText.Trim().Length != 0)
-                    {
-                        writer.WriteLine("命令号：" + commandID + "\n\n" + commandText);
-                    }
-                    else
-                    {
-                        writer.WriteLine("命令号：" + commandID + "\n\n" + "该命令车次为人工添加，无命令内容，可双击打开粘贴命令内容");
-                    }
-
-                    writer.Close();
-                    file.Close();
-                }
-                catch (Exception _e)
-                {
-
-                }
-
+                int continueSave = -1;
+                txtFile = Application.StartupPath + "\\客调命令\\" + DateTime.Now.ToString("yyyyMMdd-") + commandID + ".txt";
+                fileName = txtFile;
                 if (AllCommands.Count == 0)
                 {
                     MessageBox.Show("未找到车次，命令内容已保存至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    saveData();
+                    //保存成excel，判断有没有点取消
+                    continueSave = saveData();
                     //返回OK，模型存入excel，回主界面，（主界面重新从excel读取一次数据）
-                    MessageBox.Show("保存成功，命令内容已存储至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    //continuesave为2时，说明当日有相同命令，不添加txt
+                    if(continueSave == 1 ||
+                        continueSave == -1)
+                    {
+                        MessageBox.Show("保存成功，命令内容已存储至\n" + txtFile, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
-                this.Close();
+                //命令原文存txt
+                try
+                {
+                    if(continueSave == 1 ||
+                        continueSave == -1)
+                    {
+                        FileStream file = new FileStream(txtFile, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        StreamWriter writer = new StreamWriter(file);
+                        if (commandText.Trim().Length != 0)
+                        {
+                            writer.WriteLine("命令号：" + commandID + "\n\n" + commandText.Replace("\r", "\n"));
+                        }
+                        else
+                        {
+                            writer.WriteLine("命令号：" + commandID + "\n" + "该命令车次为人工添加，无命令内容，可双击打开粘贴命令内容");
+                        }
+
+                        writer.Close();
+                        file.Close();
+                    }
+                }
+                catch (Exception _e)
+                {
+
+                }
+                Main mainForm = (Main)this.Owner;
+                mainForm.RefreshUI();
+                if(continueSave != 0)
+                {
+                    this.Close();
+                }
+
             }
         }
 
@@ -439,7 +557,16 @@ namespace TrainProjectAnalyse
 
         private void deleteCM_btn_Click(object sender, EventArgs e)
         {
+            if (analysisListView.SelectedItems.Count != 0)
+            {
+                TrainModel _tempTrainModel = getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                foreach(NormalCommandModel _cm in AllCommands)
+                {
+                    _cm.allTrainModel.Remove(_tempTrainModel);
+                }
 
+                RefreshData();
+            }
         }
     }
 }

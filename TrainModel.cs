@@ -21,6 +21,10 @@ namespace TrainProjectAnalyse
         //命令中的第几条
         public string placeInCommand { get; set; }
 
+        //列车ID，为日期+命令号+三位数的第几个
+        //20211020 51034 002
+        public string ID { get; set; }
+
         public TrainModel()
         {
             createTime = DateTime.Now;
@@ -30,6 +34,7 @@ namespace TrainProjectAnalyse
             secondTrainNum = "";
             streamStatus = -1;
             placeInCommand = "";
+            ID = createTime.ToString("yyyyMMdd");
         }
 
         public TrainModel(DateTime _createTime, string _commandID,

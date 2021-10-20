@@ -39,24 +39,24 @@
             this.addSingleTime_dtp = new System.Windows.Forms.DateTimePicker();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.continuiesDay_addbutton = new System.Windows.Forms.Button();
-            this.singleDay_addButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
+            this.singleDay_addButton = new System.Windows.Forms.Button();
+            this.continuiesDay_addbutton = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.save_btn = new System.Windows.Forms.Button();
-            this.closeForm_btn = new System.Windows.Forms.Button();
-            this.date_lv = new System.Windows.Forms.ListView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.stopDate_btn = new System.Windows.Forms.Button();
             this.editDate_btn = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.day_txt = new System.Windows.Forms.TextBox();
             this.month_txt = new System.Windows.Forms.TextBox();
             this.year_txt = new System.Windows.Forms.TextBox();
-            this.stopDate_btn = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.date_lv = new System.Windows.Forms.ListView();
+            this.save_btn = new System.Windows.Forms.Button();
+            this.closeForm_btn = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -118,7 +118,7 @@
             // 
             // addStartTime_dtp
             // 
-            this.addStartTime_dtp.Location = new System.Drawing.Point(89, 20);
+            this.addStartTime_dtp.Location = new System.Drawing.Point(113, 30);
             this.addStartTime_dtp.Name = "addStartTime_dtp";
             this.addStartTime_dtp.Size = new System.Drawing.Size(138, 21);
             this.addStartTime_dtp.TabIndex = 216;
@@ -126,14 +126,14 @@
             // 
             // addEndTime_dtp
             // 
-            this.addEndTime_dtp.Location = new System.Drawing.Point(89, 59);
+            this.addEndTime_dtp.Location = new System.Drawing.Point(113, 69);
             this.addEndTime_dtp.Name = "addEndTime_dtp";
             this.addEndTime_dtp.Size = new System.Drawing.Size(138, 21);
             this.addEndTime_dtp.TabIndex = 218;
             // 
             // addSingleTime_dtp
             // 
-            this.addSingleTime_dtp.Location = new System.Drawing.Point(89, 140);
+            this.addSingleTime_dtp.Location = new System.Drawing.Point(113, 153);
             this.addSingleTime_dtp.Name = "addSingleTime_dtp";
             this.addSingleTime_dtp.Size = new System.Drawing.Size(138, 21);
             this.addSingleTime_dtp.TabIndex = 219;
@@ -166,68 +166,70 @@
             this.groupBox2.Controls.Add(this.addSingleTime_dtp);
             this.groupBox2.Location = new System.Drawing.Point(12, 19);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(292, 189);
+            this.groupBox2.Size = new System.Drawing.Size(292, 218);
             this.groupBox2.TabIndex = 221;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "添加日期";
             // 
-            // label5
+            // label8
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(152, 44);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(17, 12);
-            this.label5.TabIndex = 216;
-            this.label5.Text = "至";
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(55, 106);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(17, 12);
+            this.label8.TabIndex = 222;
+            this.label8.Text = "或";
             // 
-            // label6
+            // singleDay_addButton
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 44);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(77, 12);
-            this.label6.TabIndex = 220;
-            this.label6.Text = "添加连续日期";
+            this.singleDay_addButton.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.singleDay_addButton.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.singleDay_addButton.Location = new System.Drawing.Point(113, 179);
+            this.singleDay_addButton.Name = "singleDay_addButton";
+            this.singleDay_addButton.Size = new System.Drawing.Size(138, 31);
+            this.singleDay_addButton.TabIndex = 223;
+            this.singleDay_addButton.Text = "添加单独日期";
+            this.singleDay_addButton.UseVisualStyleBackColor = true;
+            this.singleDay_addButton.Click += new System.EventHandler(this.singleDay_addButton_Click);
+            // 
+            // continuiesDay_addbutton
+            // 
+            this.continuiesDay_addbutton.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.continuiesDay_addbutton.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.continuiesDay_addbutton.Location = new System.Drawing.Point(113, 96);
+            this.continuiesDay_addbutton.Name = "continuiesDay_addbutton";
+            this.continuiesDay_addbutton.Size = new System.Drawing.Size(138, 31);
+            this.continuiesDay_addbutton.TabIndex = 222;
+            this.continuiesDay_addbutton.Text = "添加连续日期";
+            this.continuiesDay_addbutton.UseVisualStyleBackColor = true;
+            this.continuiesDay_addbutton.Click += new System.EventHandler(this.continuiesDay_addbutton_Click);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 146);
+            this.label7.Location = new System.Drawing.Point(30, 159);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(77, 12);
             this.label7.TabIndex = 221;
             this.label7.Text = "添加单独日期";
             // 
-            // continuiesDay_addbutton
+            // label6
             // 
-            this.continuiesDay_addbutton.ForeColor = System.Drawing.SystemColors.MenuHighlight;
-            this.continuiesDay_addbutton.Location = new System.Drawing.Point(233, 39);
-            this.continuiesDay_addbutton.Name = "continuiesDay_addbutton";
-            this.continuiesDay_addbutton.Size = new System.Drawing.Size(53, 23);
-            this.continuiesDay_addbutton.TabIndex = 222;
-            this.continuiesDay_addbutton.Text = "添加";
-            this.continuiesDay_addbutton.UseVisualStyleBackColor = true;
-            this.continuiesDay_addbutton.Click += new System.EventHandler(this.continuiesDay_addbutton_Click);
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(30, 54);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(77, 12);
+            this.label6.TabIndex = 220;
+            this.label6.Text = "添加连续日期";
             // 
-            // singleDay_addButton
+            // label5
             // 
-            this.singleDay_addButton.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.singleDay_addButton.Location = new System.Drawing.Point(233, 140);
-            this.singleDay_addButton.Name = "singleDay_addButton";
-            this.singleDay_addButton.Size = new System.Drawing.Size(53, 23);
-            this.singleDay_addButton.TabIndex = 223;
-            this.singleDay_addButton.Text = "添加";
-            this.singleDay_addButton.UseVisualStyleBackColor = true;
-            this.singleDay_addButton.Click += new System.EventHandler(this.singleDay_addButton_Click);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(152, 103);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(17, 12);
-            this.label8.TabIndex = 222;
-            this.label8.Text = "或";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(173, 54);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(17, 12);
+            this.label5.TabIndex = 216;
+            this.label5.Text = "至";
             // 
             // groupBox3
             // 
@@ -248,39 +250,25 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "日期";
             // 
-            // save_btn
+            // label1
             // 
-            this.save_btn.ForeColor = System.Drawing.SystemColors.MenuHighlight;
-            this.save_btn.Location = new System.Drawing.Point(165, 387);
-            this.save_btn.Name = "save_btn";
-            this.save_btn.Size = new System.Drawing.Size(147, 42);
-            this.save_btn.TabIndex = 224;
-            this.save_btn.Text = "保存";
-            this.save_btn.UseVisualStyleBackColor = true;
-            this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(423, 191);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(17, 12);
+            this.label1.TabIndex = 233;
+            this.label1.Text = "月";
             // 
-            // closeForm_btn
+            // stopDate_btn
             // 
-            this.closeForm_btn.ForeColor = System.Drawing.Color.Tomato;
-            this.closeForm_btn.Location = new System.Drawing.Point(318, 387);
-            this.closeForm_btn.Name = "closeForm_btn";
-            this.closeForm_btn.Size = new System.Drawing.Size(147, 42);
-            this.closeForm_btn.TabIndex = 225;
-            this.closeForm_btn.Text = "关闭窗口";
-            this.closeForm_btn.UseVisualStyleBackColor = true;
-            this.closeForm_btn.Click += new System.EventHandler(this.closeForm_btn_Click);
-            // 
-            // date_lv
-            // 
-            this.date_lv.FullRowSelect = true;
-            this.date_lv.HideSelection = false;
-            this.date_lv.Location = new System.Drawing.Point(312, 19);
-            this.date_lv.Name = "date_lv";
-            this.date_lv.Size = new System.Drawing.Size(258, 161);
-            this.date_lv.TabIndex = 225;
-            this.date_lv.UseCompatibleStateImageBehavior = false;
-            this.date_lv.View = System.Windows.Forms.View.List;
-            this.date_lv.SelectedIndexChanged += new System.EventHandler(this.date_lv_SelectedIndexChanged);
+            this.stopDate_btn.ForeColor = System.Drawing.Color.OrangeRed;
+            this.stopDate_btn.Location = new System.Drawing.Point(408, 214);
+            this.stopDate_btn.Name = "stopDate_btn";
+            this.stopDate_btn.Size = new System.Drawing.Size(67, 23);
+            this.stopDate_btn.TabIndex = 232;
+            this.stopDate_btn.Text = "删除日期";
+            this.stopDate_btn.UseVisualStyleBackColor = true;
+            this.stopDate_btn.Click += new System.EventHandler(this.stopDate_btn_Click);
             // 
             // editDate_btn
             // 
@@ -337,25 +325,39 @@
             this.year_txt.TextChanged += new System.EventHandler(this.year_txt_TextChanged);
             this.year_txt.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.year_txt_KeyPress);
             // 
-            // stopDate_btn
+            // date_lv
             // 
-            this.stopDate_btn.ForeColor = System.Drawing.Color.OrangeRed;
-            this.stopDate_btn.Location = new System.Drawing.Point(408, 214);
-            this.stopDate_btn.Name = "stopDate_btn";
-            this.stopDate_btn.Size = new System.Drawing.Size(67, 23);
-            this.stopDate_btn.TabIndex = 232;
-            this.stopDate_btn.Text = "删除日期";
-            this.stopDate_btn.UseVisualStyleBackColor = true;
-            this.stopDate_btn.Click += new System.EventHandler(this.stopDate_btn_Click);
+            this.date_lv.FullRowSelect = true;
+            this.date_lv.HideSelection = false;
+            this.date_lv.Location = new System.Drawing.Point(312, 19);
+            this.date_lv.Name = "date_lv";
+            this.date_lv.Size = new System.Drawing.Size(258, 161);
+            this.date_lv.TabIndex = 225;
+            this.date_lv.UseCompatibleStateImageBehavior = false;
+            this.date_lv.View = System.Windows.Forms.View.List;
+            this.date_lv.SelectedIndexChanged += new System.EventHandler(this.date_lv_SelectedIndexChanged);
             // 
-            // label1
+            // save_btn
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(423, 191);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(17, 12);
-            this.label1.TabIndex = 233;
-            this.label1.Text = "月";
+            this.save_btn.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.save_btn.Location = new System.Drawing.Point(165, 387);
+            this.save_btn.Name = "save_btn";
+            this.save_btn.Size = new System.Drawing.Size(147, 42);
+            this.save_btn.TabIndex = 224;
+            this.save_btn.Text = "保存";
+            this.save_btn.UseVisualStyleBackColor = true;
+            this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
+            // 
+            // closeForm_btn
+            // 
+            this.closeForm_btn.ForeColor = System.Drawing.Color.Tomato;
+            this.closeForm_btn.Location = new System.Drawing.Point(318, 387);
+            this.closeForm_btn.Name = "closeForm_btn";
+            this.closeForm_btn.Size = new System.Drawing.Size(147, 42);
+            this.closeForm_btn.TabIndex = 225;
+            this.closeForm_btn.Text = "关闭窗口";
+            this.closeForm_btn.UseVisualStyleBackColor = true;
+            this.closeForm_btn.Click += new System.EventHandler(this.closeForm_btn_Click);
             // 
             // EditForm
             // 

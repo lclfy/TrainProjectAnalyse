@@ -38,6 +38,7 @@
             this.editCM_btn = new CCWin.SkinControl.SkinButton();
             this.deleteCM_btn = new CCWin.SkinControl.SkinButton();
             this.save_btn = new CCWin.SkinControl.SkinButton();
+            this.skinButton1 = new CCWin.SkinControl.SkinButton();
             this.SuspendLayout();
             // 
             // analysisListView
@@ -146,7 +147,7 @@
             this.deleteCM_btn.NormlBack = null;
             this.deleteCM_btn.Size = new System.Drawing.Size(94, 35);
             this.deleteCM_btn.TabIndex = 11;
-            this.deleteCM_btn.Text = "删除";
+            this.deleteCM_btn.Text = "删除列车";
             this.deleteCM_btn.UseVisualStyleBackColor = false;
             this.deleteCM_btn.Click += new System.EventHandler(this.deleteCM_btn_Click);
             // 
@@ -170,6 +171,25 @@
             this.save_btn.UseVisualStyleBackColor = false;
             this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
             // 
+            // skinButton1
+            // 
+            this.skinButton1.BackColor = System.Drawing.Color.Transparent;
+            this.skinButton1.BaseColor = System.Drawing.Color.Red;
+            this.skinButton1.BorderColor = System.Drawing.Color.Red;
+            this.skinButton1.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.skinButton1.DownBack = null;
+            this.skinButton1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.skinButton1.ForeColor = System.Drawing.Color.White;
+            this.skinButton1.Location = new System.Drawing.Point(429, 515);
+            this.skinButton1.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.skinButton1.MouseBack = null;
+            this.skinButton1.Name = "skinButton1";
+            this.skinButton1.NormlBack = null;
+            this.skinButton1.Size = new System.Drawing.Size(94, 35);
+            this.skinButton1.TabIndex = 13;
+            this.skinButton1.Text = "删除命令";
+            this.skinButton1.UseVisualStyleBackColor = false;
+            // 
             // AnalyseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -179,6 +199,7 @@
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(546, 573);
+            this.Controls.Add(this.skinButton1);
             this.Controls.Add(this.save_btn);
             this.Controls.Add(this.deleteCM_btn);
             this.Controls.Add(this.editCM_btn);
@@ -190,7 +211,7 @@
             this.Controls.Add(this.analysisListView);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "AnalyseForm";
-            this.Text = "检查与修改";
+            this.Text = "编辑命令";
             this.Load += new System.EventHandler(this.AnalyseForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -208,5 +229,6 @@
         private CCWin.SkinControl.SkinButton editCM_btn;
         private CCWin.SkinControl.SkinButton deleteCM_btn;
         private CCWin.SkinControl.SkinButton save_btn;
+        private CCWin.SkinControl.SkinButton skinButton1;
     }
 }

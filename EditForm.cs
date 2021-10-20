@@ -226,8 +226,8 @@ namespace TrainProjectAnalyse
         {
             //添加连续日期
             List<DateTime> li = new List<DateTime>();
-            DateTime time1 = addStartTime_dtp.Value;
-            DateTime time2 = addEndTime_dtp.Value;
+            DateTime time1 = addStartTime_dtp.Value.Date;
+            DateTime time2 = addEndTime_dtp.Value.Date;
             string allDates = "";
             if(time1 > time2)
             {
@@ -242,7 +242,7 @@ namespace TrainProjectAnalyse
             }
             else
             {
-                while (time1 <= time2.AddDays(1) && time1.Year > 1990 && time1 != time2)
+                while (time1 <= time2.AddDays(1) && time1.Year > 1990 && time1 != time2.AddDays(1))
                 {
                     allDates = allDates + time1.ToShortDateString() + "\n";
                     li.Add(time1);
@@ -321,8 +321,8 @@ namespace TrainProjectAnalyse
         {
             if (firstTrainNum_tb.Text.Length != 0 && date_lv.Items.Count != 0 &&streamState_lb.SelectedItem.ToString().Trim().Length != 0)
             {
-                editModel.firstTrainNum = firstTrainNum_tb.Text.Trim();
-                editModel.secondTrainNum = secondTrainNum_tb.Text.Trim();
+                editModel.firstTrainNum = firstTrainNum_tb.Text.Trim().ToUpper();
+                editModel.secondTrainNum = secondTrainNum_tb.Text.Trim().ToUpper();
                 if (streamState_lb.SelectedItem.ToString().Contains("停运"))
                 {
                     editModel.streamStatus = 0;
