@@ -22,6 +22,10 @@ namespace TrainProjectAnalyse
         string currentTXTFileName = "";
         IWorkbook WorkBook;
 
+        //时刻表Excel文件
+        string ExcelFile;
+        bool hasFilePath = false;
+
         public Main()
         {
             InitializeComponent();
@@ -32,6 +36,8 @@ namespace TrainProjectAnalyse
             edit_btn.Enabled = false;
             RefreshUI();
             today_rb.Select();
+            ExcelFile = "";
+            dataAnalyse_btn.Enabled = false;
         }
 
         //刷新内容
@@ -45,7 +51,8 @@ namespace TrainProjectAnalyse
                 loadData();
             }
             initList();
-            RefreshCommandList();
+            RefreshCommandList(allCurrentModels,allCurrentTrainModels);
+
         }
 
         private void initList()
@@ -83,26 +90,30 @@ namespace TrainProjectAnalyse
         }
 
         //刷新总表
-        private void RefreshCommandList()
+        private void RefreshCommandList(List<NormalCommandModel> _allCM,List<TrainModel> _allTM)
         {
+            //附带的小组件清空
+            DateListView.Items.Clear();
+            OriginalText_rtb.Text = "";
             //先刷新总列表，以命令名为group名，group内为命令里的车
             commandListView.Items.Clear();
             commandListView.Groups.Clear();
         
             this.commandListView.BeginUpdate();
-
-            //添加数据
-            List<NormalCommandModel> _allCM = allCurrentModels;
-            List<TrainModel> _allTM = allCurrentTrainModels;
-
-            for (int q = 0; q < _allCM.Count; q++)
+            bool hasTrains = true;
+            //先倒着把分组加进去，展示的时候就是时间倒序的了
+            for(int ij = _allCM.Count-1; ij >= 0; ij--)
             {
                 //以"[命令名]-日期shortdate"作为组名，组内放车
-                ListViewGroup _tempGroup = new ListViewGroup("["+_allCM[q].commandID+"]-"+_allCM[q].createTime.ToShortDateString());
+                ListViewGroup _tempGroup = new ListViewGroup("[" + _allCM[ij].commandID + "]-" + _allCM[ij].createTime.ToString("yyyy/MM/dd"));
+                this.commandListView.Groups.Add(_tempGroup);
+            }
+            for (int q = 0; q < _allCM.Count; q++)
+            {
                 for (int j = 0; j < _allTM.Count; j++)
                 {
                     if (_allTM[j].commandID.Trim().Equals(_allCM[q].commandID) &&
-                        _allTM[j].createTime.ToShortDateString().Equals(_allCM[q].createTime.ToShortDateString()))
+                        _allTM[j].createTime.ToString("yyyy/MM/dd").Equals(_allCM[q].createTime.ToString("yyyy/MM/dd")))
                     {
                         TrainModel _tm = _allTM[j];
                         ListViewItem item = new ListViewItem();
@@ -126,18 +137,25 @@ namespace TrainProjectAnalyse
                             item.SubItems.Add("未找到");
                         }
                         item.SubItems.Add("单击显示");
-                        
-                        this.commandListView.Groups.Add(_tempGroup);
-                        item.Group = commandListView.Groups[q];
+                        item.Group = commandListView.Groups[_allCM.Count - q -1];
                         commandListView.Items.Add(item);
+
                         //在此处把车和命令匹配在一起，变更任意一个都会变更两个项目
-                        _allCM[q].allTrainModel.Add(_allTM[j]);
+                        //如果allcm[q]没有车，再添加
+                        if(_allCM[q].allTrainModel.Count == 0)
+                        {
+                            hasTrains = false;
+                        }
+                        if (!hasTrains)
+                        {
+                            _allCM[q].allTrainModel.Add(_allTM[j]);
+                        }
+
                         //_tempGroup.Items.Add(item);
 
                     }
                 }
             }
-            allCurrentModels = _allCM;
             ImageList imgList = new ImageList();
             imgList.ImageSize = new Size(1, 20);// 设置行高 20 //分别是宽和高 
             commandListView.SmallImageList = imgList; //这里设置listView的SmallImageList ,用imgList将其撑大 
@@ -166,12 +184,15 @@ namespace TrainProjectAnalyse
                     continue;
                 }
                 NormalCommandModel _cm = new NormalCommandModel();
+                //如果全空，就不添加
+                int nullCounter = 0;
                 if (row.GetCell(0) != null)
                 {
                     _cm.createTime = DateTime.Parse(row.GetCell(0).ToString());
                 }
                 else
                 {
+                    nullCounter += 1;
                     _cm.createTime = DateTime.Parse("0001/01/01");
                 }
                 if (row.GetCell(1) != null)
@@ -180,6 +201,7 @@ namespace TrainProjectAnalyse
                 }
                 else
                 {
+                    nullCounter += 1;
                     _cm.commandID = "";
                 }
                 if (row.GetCell(2) != null)
@@ -188,13 +210,26 @@ namespace TrainProjectAnalyse
                 }
                 else
                 {
+                    nullCounter += 1;
                     _cm.fileName = "";
                 }
                 if (row.GetCell(3) != null)
                 {
                     _cm.ID = row.GetCell(3).ToString();
                 }
-                allCurrentModels.Add(_cm);
+                if (row.GetCell(4) != null)
+                {
+                    if (Regex.IsMatch(row.GetCell(4).ToString(), @"^[0-9]\d*$"))
+                    {
+                        _cm.TrainIDCount = int.Parse(row.GetCell(4).ToString());
+                    }
+                }
+                //全空不添加
+                if (nullCounter != 3)
+                {
+                    allCurrentModels.Add(_cm);
+                }
+
             }
             titleRow = true;
             foreach (IRow row in sheetTrains)
@@ -272,7 +307,9 @@ namespace TrainProjectAnalyse
                 {
                     _tm.ID = row.GetCell(7).ToString();
                 }
+                //有项目没有，不添加
                 allCurrentTrainModels.Add(_tm);
+
             }
             int a = 0;
         }
@@ -647,14 +684,6 @@ namespace TrainProjectAnalyse
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-            //区分是不是高铁命令
-            bool isHighSpeedCommand = false;
-
-            if (isHighSpeedCommand)
-            {
-                getCommands_HighSpeed(command_rtb.Text);
-            }
-            else
             {
                 getCommands(command_rtb.Text);
                 commandText = command_rtb.Text;
@@ -668,6 +697,13 @@ namespace TrainProjectAnalyse
                     //复制完后从最上面开始显示
                     this.command_rtb.Select(0, 0);
                     command_rtb.ScrollToCaret();
+                    if (allCommands.Count != 0)
+                    {
+                        //最后参数为1则为编辑现有命令模式，为0为添加命令模式
+                        AnalyseForm _af = new AnalyseForm(allCommands, commandText, WorkBook, 0);
+                        _af.Owner = this;
+                        _af.Show();
+                    }
                 }
 
             }
@@ -710,7 +746,7 @@ namespace TrainProjectAnalyse
             {
                 // 创建一个 StreamReader 的实例来读取文件 
                 // using 语句也能关闭 StreamReader
-                if (!fileName.Equals(currentTXTFileName))
+                if (!fileName.Equals(currentTXTFileName) || (OriginalText_rtb.Text.Length == 0))
                 {
                     currentTXTFileName = fileName;
                     using (StreamReader sr = new StreamReader(fileName))
@@ -747,7 +783,7 @@ namespace TrainProjectAnalyse
             foreach(NormalCommandModel _cm in allCurrentModels)
             {
                 //找到了命令
-                if(_cm.commandID.Equals(commandID) && _cm.createTime.ToShortDateString().Equals(createDate))
+                if(_cm.commandID.Equals(commandID) && _cm.createTime.ToString("yyyy/MM/dd").Equals(createDate))
                 {
                     _tempCM = _cm;
                 }
@@ -844,8 +880,7 @@ namespace TrainProjectAnalyse
             }
         }
 
-        //编辑命令
-        private void EditSelectedCommand_btn_Click(object sender, EventArgs e)
+        private void StartEditCommand()
         {
             if (commandListView.SelectedItems.Count != 0)
             {
@@ -853,10 +888,16 @@ namespace TrainProjectAnalyse
                 List<NormalCommandModel> _listCM = new List<NormalCommandModel>();
                 _listCM.Add(_tempCM);
                 //最后参数为1则为编辑命令模式，为0为添加命令模式
-                AnalyseForm _af = new AnalyseForm(_listCM, commandText, WorkBook,1);
+                AnalyseForm _af = new AnalyseForm(_listCM, commandText, WorkBook, 1);
                 _af.Owner = this;
                 _af.Show();
             }
+        }
+
+        //编辑命令
+        private void EditSelectedCommand_btn_Click(object sender, EventArgs e)
+        {
+            StartEditCommand();
 
         }
 
@@ -865,9 +906,155 @@ namespace TrainProjectAnalyse
 
         }
 
+
+
+        private void commandListView_DoubleClick(object sender, EventArgs e)
+        {
+            StartEditCommand();
+        }
+
+        //搜索
+
+        private void searchCommand_tb_TextChanged(object sender, EventArgs e)
+        {
+            if(searchCommand_tb.Text.Length != 0)
+            {
+                string text = searchCommand_tb.Text.ToUpper();
+                //搜索命令，使用特定的模型刷新主表
+                List<NormalCommandModel> _allCM = new List<NormalCommandModel>(0);
+                List<TrainModel> _allTM = new List<TrainModel>();
+                foreach (NormalCommandModel _cm in allCurrentModels)
+                {
+                    if (_cm.commandID.Contains(text.Trim())) 
+                    {
+                        _allCM.Add(_cm);
+                        //把所有的车取出来，展示要用
+                        foreach (TrainModel _tm in _cm.allTrainModel)
+                        {
+                            _allTM.Add(_tm);
+                        }
+                    }
+                }
+                RefreshCommandList(_allCM, _allTM);
+            }
+            else
+            {
+                RefreshCommandList(allCurrentModels, allCurrentTrainModels);
+            }
+
+        }
+
         private void searchTrain_tb_TextChanged(object sender, EventArgs e)
         {
+            if (searchTrain_tb.Text.Length != 0)
+            {
+                string text = searchTrain_tb.Text.ToUpper();
+                //搜索命令，使用特定的模型刷新主表
+                List<NormalCommandModel> _allCM = new List<NormalCommandModel>(0);
+                List<TrainModel> _allTM = new List<TrainModel>();
+                foreach (NormalCommandModel _cm in allCurrentModels)
+                {
+                    {
+                        //把所有的车取出来，展示要用
+                        //同一个命令只添加一次就够了
+                        bool hasGotCM = false;
+                        foreach (TrainModel _tm in _cm.allTrainModel)
+                        {
+                            if(_tm.firstTrainNum.Contains(text) ||
+                                _tm.secondTrainNum.Contains(text))
+                            {
+                                if(hasGotCM == false)
+                                {
+                                    _allCM.Add(_cm);
+                                    hasGotCM = true;
+                                }
+                                _allTM.Add(_tm);
+                            }
 
+                        }
+                    }
+                }
+                RefreshCommandList(_allCM, _allTM);
+            }
+            else
+            {
+                RefreshCommandList(allCurrentModels, allCurrentTrainModels);
+            }
+            //搜索车次
+        }
+
+        private void SelectPath()
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();   //显示选择文件对话框 
+            openFileDialog1.Filter = "Excel 2003 文件 (*.xls)|*.xls";
+            openFileDialog1.Multiselect = false;
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                {
+                    ExcelFile = "";
+                    int fileCount = 0;
+                    String fileNames = "已选择：";
+                    foreach (string fileName in openFileDialog1.FileNames)
+                    {
+                        ExcelFile = fileName;
+                    }
+                     this.TimeTableFileName_lbl.Text = "已选择：" + fileCount + "个文件";
+                    hasFilePath = true;
+                }
+                dataAnalyse_btn.Enabled = true;
+            }
+        }
+
+        //导入时刻表文件
+        private void importTimeTable_btn_Click(object sender, EventArgs e)
+        {
+            SelectPath();
+        }
+
+        //分析列车运行情况
+        private void dataAnalyse_btn_Click(object sender, EventArgs e)
+        {
+            //看选中的是今天还是明天，今天就传今天进去
+            DateTime _dt = DateTime.Now.Date;
+            if (tomorrow_rb.Checked)
+            {
+                _dt = DateTime.Today.AddDays(1).Date;
+            }
+            IWorkbook workbook = new HSSFWorkbook(new FileStream(ExcelFile, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+            ConfirmCommand _ccForm = new ConfirmCommand(workbook,_dt,allCurrentModels);
+            _ccForm.Owner = this;
+            _ccForm.Show();
+        }
+        private void 粘贴ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText())
+            {
+                粘贴ToolStripMenuItem.Enabled = true;
+            }
+            else
+                粘贴ToolStripMenuItem.Enabled = false;
+
+            ((RichTextBox)contextMenuStrip1.SourceControl).Paste();
+            //command_rTb.Paste(); //粘贴
+        }
+
+
+
+        private void 清空ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ((RichTextBox)contextMenuStrip1.SourceControl).Clear();
+            //command_rTb.Clear(); //清空
+        }
+
+        private void 复制toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            string selectText = ((RichTextBox)contextMenuStrip1.SourceControl).SelectedText;
+            if (selectText != "")
+            {
+                Clipboard.SetText(selectText);
+            }
         }
     }
 }

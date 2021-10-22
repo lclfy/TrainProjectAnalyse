@@ -41,28 +41,34 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.OriginalText_rtb = new System.Windows.Forms.RichTextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.DateListView = new System.Windows.Forms.ListView();
+            this.searchTrain_tb = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.EditSelectedCommand_btn = new CCWin.SkinControl.SkinButton();
             this.searchCommand_tb = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.commandListView = new System.Windows.Forms.ListView();
             this.dataAnalyse_btn = new CCWin.SkinControl.SkinButton();
             this.importTimeTable_btn = new CCWin.SkinControl.SkinButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.EditSelectedCommand_btn = new CCWin.SkinControl.SkinButton();
-            this.searchTrain_tb = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.DateListView = new System.Windows.Forms.ListView();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.复制toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.粘贴ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.清空ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // command_rtb
             // 
+            this.command_rtb.ContextMenuStrip = this.contextMenuStrip1;
             this.command_rtb.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.command_rtb.Location = new System.Drawing.Point(5, 19);
-            this.command_rtb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.command_rtb.Margin = new System.Windows.Forms.Padding(2);
             this.command_rtb.Name = "command_rtb";
             this.command_rtb.Size = new System.Drawing.Size(303, 495);
             this.command_rtb.TabIndex = 0;
@@ -208,7 +214,7 @@
             // 
             this.OriginalText_rtb.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.OriginalText_rtb.Location = new System.Drawing.Point(5, 28);
-            this.OriginalText_rtb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.OriginalText_rtb.Margin = new System.Windows.Forms.Padding(2);
             this.OriginalText_rtb.Name = "OriginalText_rtb";
             this.OriginalText_rtb.ReadOnly = true;
             this.OriginalText_rtb.Size = new System.Drawing.Size(320, 415);
@@ -234,6 +240,57 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "全部命令及车次";
             // 
+            // DateListView
+            // 
+            this.DateListView.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.DateListView.HideSelection = false;
+            this.DateListView.Location = new System.Drawing.Point(272, 60);
+            this.DateListView.Name = "DateListView";
+            this.DateListView.Size = new System.Drawing.Size(116, 481);
+            this.DateListView.TabIndex = 44;
+            this.DateListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // searchTrain_tb
+            // 
+            this.searchTrain_tb.Location = new System.Drawing.Point(201, 25);
+            this.searchTrain_tb.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.searchTrain_tb.Name = "searchTrain_tb";
+            this.searchTrain_tb.Size = new System.Drawing.Size(65, 26);
+            this.searchTrain_tb.TabIndex = 42;
+            this.searchTrain_tb.TextChanged += new System.EventHandler(this.searchTrain_tb_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(137, 28);
+            this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(65, 20);
+            this.label3.TabIndex = 43;
+            this.label3.Text = "搜索车次";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // EditSelectedCommand_btn
+            // 
+            this.EditSelectedCommand_btn.BackColor = System.Drawing.Color.Transparent;
+            this.EditSelectedCommand_btn.BaseColor = System.Drawing.Color.OrangeRed;
+            this.EditSelectedCommand_btn.BorderColor = System.Drawing.Color.OrangeRed;
+            this.EditSelectedCommand_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.EditSelectedCommand_btn.DownBack = null;
+            this.EditSelectedCommand_btn.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.EditSelectedCommand_btn.ForeColor = System.Drawing.Color.White;
+            this.EditSelectedCommand_btn.Location = new System.Drawing.Point(272, 25);
+            this.EditSelectedCommand_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.EditSelectedCommand_btn.MouseBack = null;
+            this.EditSelectedCommand_btn.Name = "EditSelectedCommand_btn";
+            this.EditSelectedCommand_btn.NormlBack = null;
+            this.EditSelectedCommand_btn.Size = new System.Drawing.Size(116, 26);
+            this.EditSelectedCommand_btn.TabIndex = 41;
+            this.EditSelectedCommand_btn.Text = "编辑命令";
+            this.EditSelectedCommand_btn.UseVisualStyleBackColor = false;
+            this.EditSelectedCommand_btn.Click += new System.EventHandler(this.EditSelectedCommand_btn_Click);
+            // 
             // searchCommand_tb
             // 
             this.searchCommand_tb.Location = new System.Drawing.Point(70, 25);
@@ -241,6 +298,7 @@
             this.searchCommand_tb.Name = "searchCommand_tb";
             this.searchCommand_tb.Size = new System.Drawing.Size(65, 26);
             this.searchCommand_tb.TabIndex = 31;
+            this.searchCommand_tb.TextChanged += new System.EventHandler(this.searchCommand_tb_TextChanged);
             // 
             // label2
             // 
@@ -266,6 +324,7 @@
             this.commandListView.UseCompatibleStateImageBehavior = false;
             this.commandListView.View = System.Windows.Forms.View.Details;
             this.commandListView.SelectedIndexChanged += new System.EventHandler(this.commandListView_SelectedIndexChanged);
+            this.commandListView.DoubleClick += new System.EventHandler(this.commandListView_DoubleClick);
             // 
             // dataAnalyse_btn
             // 
@@ -283,8 +342,9 @@
             this.dataAnalyse_btn.NormlBack = null;
             this.dataAnalyse_btn.Size = new System.Drawing.Size(252, 43);
             this.dataAnalyse_btn.TabIndex = 38;
-            this.dataAnalyse_btn.Text = "查看列车运行计划";
+            this.dataAnalyse_btn.Text = "制作列车运行计划";
             this.dataAnalyse_btn.UseVisualStyleBackColor = false;
+            this.dataAnalyse_btn.Click += new System.EventHandler(this.dataAnalyse_btn_Click);
             // 
             // importTimeTable_btn
             // 
@@ -304,6 +364,7 @@
             this.importTimeTable_btn.TabIndex = 37;
             this.importTimeTable_btn.Text = "导入时刻表文件";
             this.importTimeTable_btn.UseVisualStyleBackColor = false;
+            this.importTimeTable_btn.Click += new System.EventHandler(this.importTimeTable_btn_Click);
             // 
             // label1
             // 
@@ -316,56 +377,36 @@
             this.label1.TabIndex = 6;
             this.label1.Text = "build01-202110";
             // 
-            // EditSelectedCommand_btn
+            // contextMenuStrip1
             // 
-            this.EditSelectedCommand_btn.BackColor = System.Drawing.Color.Transparent;
-            this.EditSelectedCommand_btn.BaseColor = System.Drawing.Color.OrangeRed;
-            this.EditSelectedCommand_btn.BorderColor = System.Drawing.Color.OrangeRed;
-            this.EditSelectedCommand_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
-            this.EditSelectedCommand_btn.DownBack = null;
-            this.EditSelectedCommand_btn.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.EditSelectedCommand_btn.ForeColor = System.Drawing.Color.White;
-            this.EditSelectedCommand_btn.Location = new System.Drawing.Point(272, 25);
-            this.EditSelectedCommand_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.EditSelectedCommand_btn.MouseBack = null;
-            this.EditSelectedCommand_btn.Name = "EditSelectedCommand_btn";
-            this.EditSelectedCommand_btn.NormlBack = null;
-            this.EditSelectedCommand_btn.Size = new System.Drawing.Size(116, 26);
-            this.EditSelectedCommand_btn.TabIndex = 41;
-            this.EditSelectedCommand_btn.Text = "编辑命令";
-            this.EditSelectedCommand_btn.UseVisualStyleBackColor = false;
-            this.EditSelectedCommand_btn.Click += new System.EventHandler(this.EditSelectedCommand_btn_Click);
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.复制toolStripMenuItem1,
+            this.粘贴ToolStripMenuItem,
+            this.清空ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 70);
             // 
-            // searchTrain_tb
+            // 复制toolStripMenuItem1
             // 
-            this.searchTrain_tb.Location = new System.Drawing.Point(201, 25);
-            this.searchTrain_tb.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.searchTrain_tb.Name = "searchTrain_tb";
-            this.searchTrain_tb.Size = new System.Drawing.Size(65, 26);
-            this.searchTrain_tb.TabIndex = 42;
-            this.searchTrain_tb.TextChanged += new System.EventHandler(this.searchTrain_tb_TextChanged);
+            this.复制toolStripMenuItem1.Name = "复制toolStripMenuItem1";
+            this.复制toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.复制toolStripMenuItem1.Text = "复制";
+            this.复制toolStripMenuItem1.Click += new System.EventHandler(this.复制toolStripMenuItem1_Click);
             // 
-            // label3
+            // 粘贴ToolStripMenuItem
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(137, 28);
-            this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(65, 20);
-            this.label3.TabIndex = 43;
-            this.label3.Text = "搜索车次";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
+            this.粘贴ToolStripMenuItem.Name = "粘贴ToolStripMenuItem";
+            this.粘贴ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.粘贴ToolStripMenuItem.Text = "粘贴";
+            this.粘贴ToolStripMenuItem.Click += new System.EventHandler(this.粘贴ToolStripMenuItem_Click);
             // 
-            // DateListView
+            // 清空ToolStripMenuItem
             // 
-            this.DateListView.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.DateListView.HideSelection = false;
-            this.DateListView.Location = new System.Drawing.Point(272, 60);
-            this.DateListView.Name = "DateListView";
-            this.DateListView.Size = new System.Drawing.Size(116, 481);
-            this.DateListView.TabIndex = 44;
-            this.DateListView.UseCompatibleStateImageBehavior = false;
+            this.清空ToolStripMenuItem.Name = "清空ToolStripMenuItem";
+            this.清空ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.清空ToolStripMenuItem.Text = "清空";
+            this.清空ToolStripMenuItem.Click += new System.EventHandler(this.清空ToolStripMenuItem_Click);
             // 
             // Main
             // 
@@ -375,11 +416,11 @@
             this.BorderColor = System.Drawing.Color.White;
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1129, 694);
+            this.ClientSize = new System.Drawing.Size(1117, 694);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Main";
             this.Text = "郑州站列车运行计划辅助系统";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -391,6 +432,7 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -420,6 +462,10 @@
         private System.Windows.Forms.TextBox searchTrain_tb;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListView DateListView;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 复制toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 粘贴ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 清空ToolStripMenuItem;
     }
 }
 

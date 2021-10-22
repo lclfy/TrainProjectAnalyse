@@ -14,6 +14,8 @@ namespace TrainProjectAnalyse
         //列车ID，为日期+命令号
         //2021102051034
         public string ID { get; set; }
+        //里面Train的ID总数，添加新的时直接+1即可
+        public int TrainIDCount { get; set; }
 
         public NormalCommandModel()
         {
@@ -22,6 +24,7 @@ namespace TrainProjectAnalyse
             allTrainModel = new List<TrainModel>();
             fileName = "";
             ID = createTime.ToString("yyyyMMdd");
+            TrainIDCount = 1;
         }
     }
 }

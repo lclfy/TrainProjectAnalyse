@@ -189,8 +189,12 @@ namespace TrainProjectAnalyse
 
         private void editDate_btn_Click(object sender, EventArgs e)
         {
+            if(date_lv.SelectedItems.Count == 0)
+            {
+                return;
+            }
             //不能为空
-            if(year_txt.Text.Length != 0 && month_txt.Text.Length!=0 && day_txt.Text.Length != 0)
+            if (year_txt.Text.Length != 0 && month_txt.Text.Length!=0 && day_txt.Text.Length != 0)
             {
                 string NewTime = editYear + "-" + editMonth + "-" + editDay;
                 DateTime NewDateTime;
@@ -213,8 +217,12 @@ namespace TrainProjectAnalyse
         }
         private void stopDate_btn_Click(object sender, EventArgs e)
         {
-            DeleteDate(date_lv.Items.IndexOf(date_lv.SelectedItems[0]));
-            RefreshDateView();
+            if(date_lv.SelectedItems.Count != 0)
+            {
+                DeleteDate(date_lv.Items.IndexOf(date_lv.SelectedItems[0]));
+                RefreshDateView();
+            }
+
         }
 
         private void addStartTime_dtp_ValueChanged(object sender, EventArgs e)
@@ -236,7 +244,7 @@ namespace TrainProjectAnalyse
             }
             else if (time1.Date == time2.Date)
             {
-                allDates = allDates + time1.ToShortDateString() + "\n";
+                allDates = allDates + time1.ToString("yyyy/MM/dd") + "\n";
                 li.Add(time1);
                 time1 = time1.AddDays(1);
             }
@@ -244,7 +252,7 @@ namespace TrainProjectAnalyse
             {
                 while (time1 <= time2.AddDays(1) && time1.Year > 1990 && time1 != time2.AddDays(1))
                 {
-                    allDates = allDates + time1.ToShortDateString() + "\n";
+                    allDates = allDates + time1.ToString("yyyy/MM/dd") + "\n";
                     li.Add(time1);
                     time1 = time1.AddDays(1);
                 }
@@ -261,9 +269,9 @@ namespace TrainProjectAnalyse
                     foreach(DateTime _trainDT in editModel.effectiveDates)
                     {
                         //有重复的，不能添加
-                        if (_trainDT.ToShortDateString().Equals(_dt.ToShortDateString()))
+                        if (_trainDT.ToString("yyyy/MM/dd").Equals(_dt.ToString("yyyy/MM/dd")))
                         {
-                            sameDates = sameDates + _dt.ToShortDateString() + "\n";
+                            sameDates = sameDates + _dt.ToString("yyyy/MM/dd") + "\n";
                             hasGot = true;
                             break;
                         }
@@ -287,7 +295,7 @@ namespace TrainProjectAnalyse
         {
             //添加单一日期
             DateTime _date = addSingleTime_dtp.Value;
-            if (MessageBox.Show("要添加的日期为：\n" + _date.ToShortDateString() + "\n是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+            if (MessageBox.Show("要添加的日期为：\n" + _date.ToString("yyyy/MM/dd") + "\n是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
             {
                 //判断是否有重复日期
                 string sameDates = "";
@@ -296,9 +304,9 @@ namespace TrainProjectAnalyse
                     foreach (DateTime _trainDT in editModel.effectiveDates)
                     {
                         //有重复的，不能添加
-                        if (_trainDT.ToShortDateString().Equals(_date.ToShortDateString()))
+                        if (_trainDT.ToString("yyyy/MM/dd").Equals(_date.ToString("yyyy/MM/dd")))
                         {
-                            sameDates = sameDates + _date.ToShortDateString() + "\n";
+                            sameDates = sameDates + _date.ToString("yyyy/MM/dd") + "\n";
                             hasGot = true;
                             break;
                         }

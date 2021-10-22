@@ -36,9 +36,14 @@
             this.label2 = new System.Windows.Forms.Label();
             this.addCM_btn = new CCWin.SkinControl.SkinButton();
             this.editCM_btn = new CCWin.SkinControl.SkinButton();
-            this.deleteCM_btn = new CCWin.SkinControl.SkinButton();
+            this.deleteTrain_btn = new CCWin.SkinControl.SkinButton();
             this.save_btn = new CCWin.SkinControl.SkinButton();
-            this.skinButton1 = new CCWin.SkinControl.SkinButton();
+            this.deleteCommand_btn = new CCWin.SkinControl.SkinButton();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.复制toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.粘贴ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.清空ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // analysisListView
@@ -131,25 +136,25 @@
             this.editCM_btn.UseVisualStyleBackColor = false;
             this.editCM_btn.Click += new System.EventHandler(this.editCM_btn_Click);
             // 
-            // deleteCM_btn
+            // deleteTrain_btn
             // 
-            this.deleteCM_btn.BackColor = System.Drawing.Color.Transparent;
-            this.deleteCM_btn.BaseColor = System.Drawing.Color.Tomato;
-            this.deleteCM_btn.BorderColor = System.Drawing.Color.Tomato;
-            this.deleteCM_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
-            this.deleteCM_btn.DownBack = null;
-            this.deleteCM_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.deleteCM_btn.ForeColor = System.Drawing.Color.White;
-            this.deleteCM_btn.Location = new System.Drawing.Point(312, 471);
-            this.deleteCM_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.deleteCM_btn.MouseBack = null;
-            this.deleteCM_btn.Name = "deleteCM_btn";
-            this.deleteCM_btn.NormlBack = null;
-            this.deleteCM_btn.Size = new System.Drawing.Size(94, 35);
-            this.deleteCM_btn.TabIndex = 11;
-            this.deleteCM_btn.Text = "删除列车";
-            this.deleteCM_btn.UseVisualStyleBackColor = false;
-            this.deleteCM_btn.Click += new System.EventHandler(this.deleteCM_btn_Click);
+            this.deleteTrain_btn.BackColor = System.Drawing.Color.Transparent;
+            this.deleteTrain_btn.BaseColor = System.Drawing.Color.Tomato;
+            this.deleteTrain_btn.BorderColor = System.Drawing.Color.Tomato;
+            this.deleteTrain_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.deleteTrain_btn.DownBack = null;
+            this.deleteTrain_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteTrain_btn.ForeColor = System.Drawing.Color.White;
+            this.deleteTrain_btn.Location = new System.Drawing.Point(312, 471);
+            this.deleteTrain_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.deleteTrain_btn.MouseBack = null;
+            this.deleteTrain_btn.Name = "deleteTrain_btn";
+            this.deleteTrain_btn.NormlBack = null;
+            this.deleteTrain_btn.Size = new System.Drawing.Size(94, 35);
+            this.deleteTrain_btn.TabIndex = 11;
+            this.deleteTrain_btn.Text = "删除列车";
+            this.deleteTrain_btn.UseVisualStyleBackColor = false;
+            this.deleteTrain_btn.Click += new System.EventHandler(this.deleteCM_btn_Click);
             // 
             // save_btn
             // 
@@ -171,24 +176,56 @@
             this.save_btn.UseVisualStyleBackColor = false;
             this.save_btn.Click += new System.EventHandler(this.save_btn_Click);
             // 
-            // skinButton1
+            // deleteCommand_btn
             // 
-            this.skinButton1.BackColor = System.Drawing.Color.Transparent;
-            this.skinButton1.BaseColor = System.Drawing.Color.Red;
-            this.skinButton1.BorderColor = System.Drawing.Color.Red;
-            this.skinButton1.ControlState = CCWin.SkinClass.ControlState.Normal;
-            this.skinButton1.DownBack = null;
-            this.skinButton1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.skinButton1.ForeColor = System.Drawing.Color.White;
-            this.skinButton1.Location = new System.Drawing.Point(429, 515);
-            this.skinButton1.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.skinButton1.MouseBack = null;
-            this.skinButton1.Name = "skinButton1";
-            this.skinButton1.NormlBack = null;
-            this.skinButton1.Size = new System.Drawing.Size(94, 35);
-            this.skinButton1.TabIndex = 13;
-            this.skinButton1.Text = "删除命令";
-            this.skinButton1.UseVisualStyleBackColor = false;
+            this.deleteCommand_btn.BackColor = System.Drawing.Color.Transparent;
+            this.deleteCommand_btn.BaseColor = System.Drawing.Color.Red;
+            this.deleteCommand_btn.BorderColor = System.Drawing.Color.Red;
+            this.deleteCommand_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.deleteCommand_btn.DownBack = null;
+            this.deleteCommand_btn.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteCommand_btn.ForeColor = System.Drawing.Color.White;
+            this.deleteCommand_btn.Location = new System.Drawing.Point(429, 515);
+            this.deleteCommand_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.deleteCommand_btn.MouseBack = null;
+            this.deleteCommand_btn.Name = "deleteCommand_btn";
+            this.deleteCommand_btn.NormlBack = null;
+            this.deleteCommand_btn.Size = new System.Drawing.Size(94, 35);
+            this.deleteCommand_btn.TabIndex = 13;
+            this.deleteCommand_btn.Text = "删除命令";
+            this.deleteCommand_btn.UseVisualStyleBackColor = false;
+            this.deleteCommand_btn.Click += new System.EventHandler(this.deleteCommand_btn_Click);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.复制toolStripMenuItem1,
+            this.粘贴ToolStripMenuItem,
+            this.清空ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 92);
+            // 
+            // 复制toolStripMenuItem1
+            // 
+            this.复制toolStripMenuItem1.Name = "复制toolStripMenuItem1";
+            this.复制toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.复制toolStripMenuItem1.Text = "复制";
+            this.复制toolStripMenuItem1.Click += new System.EventHandler(this.复制toolStripMenuItem1_Click);
+            // 
+            // 粘贴ToolStripMenuItem
+            // 
+            this.粘贴ToolStripMenuItem.Name = "粘贴ToolStripMenuItem";
+            this.粘贴ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.粘贴ToolStripMenuItem.Text = "粘贴";
+            this.粘贴ToolStripMenuItem.Click += new System.EventHandler(this.粘贴ToolStripMenuItem_Click);
+            // 
+            // 清空ToolStripMenuItem
+            // 
+            this.清空ToolStripMenuItem.Name = "清空ToolStripMenuItem";
+            this.清空ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.清空ToolStripMenuItem.Text = "清空";
+            this.清空ToolStripMenuItem.Click += new System.EventHandler(this.清空ToolStripMenuItem_Click);
             // 
             // AnalyseForm
             // 
@@ -199,9 +236,9 @@
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(546, 573);
-            this.Controls.Add(this.skinButton1);
+            this.Controls.Add(this.deleteCommand_btn);
             this.Controls.Add(this.save_btn);
-            this.Controls.Add(this.deleteCM_btn);
+            this.Controls.Add(this.deleteTrain_btn);
             this.Controls.Add(this.editCM_btn);
             this.Controls.Add(this.addCM_btn);
             this.Controls.Add(this.label2);
@@ -213,6 +250,7 @@
             this.Name = "AnalyseForm";
             this.Text = "编辑命令";
             this.Load += new System.EventHandler(this.AnalyseForm_Load);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -227,8 +265,12 @@
         private System.Windows.Forms.Label label2;
         private CCWin.SkinControl.SkinButton addCM_btn;
         private CCWin.SkinControl.SkinButton editCM_btn;
-        private CCWin.SkinControl.SkinButton deleteCM_btn;
+        private CCWin.SkinControl.SkinButton deleteTrain_btn;
         private CCWin.SkinControl.SkinButton save_btn;
-        private CCWin.SkinControl.SkinButton skinButton1;
+        private CCWin.SkinControl.SkinButton deleteCommand_btn;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 复制toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 粘贴ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 清空ToolStripMenuItem;
     }
 }
