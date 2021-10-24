@@ -29,7 +29,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.command_rtb = new System.Windows.Forms.RichTextBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.复制toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.粘贴ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.清空ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.addCommandManually_btn = new CCWin.SkinControl.SkinButton();
             this.edit_btn = new CCWin.SkinControl.SkinButton();
@@ -51,16 +56,12 @@
             this.dataAnalyse_btn = new CCWin.SkinControl.SkinButton();
             this.importTimeTable_btn = new CCWin.SkinControl.SkinButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.复制toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.粘贴ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.清空ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // command_rtb
@@ -68,12 +69,43 @@
             this.command_rtb.ContextMenuStrip = this.contextMenuStrip1;
             this.command_rtb.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.command_rtb.Location = new System.Drawing.Point(5, 19);
-            this.command_rtb.Margin = new System.Windows.Forms.Padding(2);
+            this.command_rtb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.command_rtb.Name = "command_rtb";
             this.command_rtb.Size = new System.Drawing.Size(303, 495);
             this.command_rtb.TabIndex = 0;
             this.command_rtb.Text = "";
             this.command_rtb.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.复制toolStripMenuItem1,
+            this.粘贴ToolStripMenuItem,
+            this.清空ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 70);
+            // 
+            // 复制toolStripMenuItem1
+            // 
+            this.复制toolStripMenuItem1.Name = "复制toolStripMenuItem1";
+            this.复制toolStripMenuItem1.Size = new System.Drawing.Size(100, 22);
+            this.复制toolStripMenuItem1.Text = "复制";
+            this.复制toolStripMenuItem1.Click += new System.EventHandler(this.复制toolStripMenuItem1_Click);
+            // 
+            // 粘贴ToolStripMenuItem
+            // 
+            this.粘贴ToolStripMenuItem.Name = "粘贴ToolStripMenuItem";
+            this.粘贴ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.粘贴ToolStripMenuItem.Text = "粘贴";
+            this.粘贴ToolStripMenuItem.Click += new System.EventHandler(this.粘贴ToolStripMenuItem_Click);
+            // 
+            // 清空ToolStripMenuItem
+            // 
+            this.清空ToolStripMenuItem.Name = "清空ToolStripMenuItem";
+            this.清空ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.清空ToolStripMenuItem.Text = "清空";
+            this.清空ToolStripMenuItem.Click += new System.EventHandler(this.清空ToolStripMenuItem_Click);
             // 
             // groupBox1
             // 
@@ -214,7 +246,7 @@
             // 
             this.OriginalText_rtb.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.OriginalText_rtb.Location = new System.Drawing.Point(5, 28);
-            this.OriginalText_rtb.Margin = new System.Windows.Forms.Padding(2);
+            this.OriginalText_rtb.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.OriginalText_rtb.Name = "OriginalText_rtb";
             this.OriginalText_rtb.ReadOnly = true;
             this.OriginalText_rtb.Size = new System.Drawing.Size(320, 415);
@@ -377,37 +409,6 @@
             this.label1.TabIndex = 6;
             this.label1.Text = "build01-202110";
             // 
-            // contextMenuStrip1
-            // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.复制toolStripMenuItem1,
-            this.粘贴ToolStripMenuItem,
-            this.清空ToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 70);
-            // 
-            // 复制toolStripMenuItem1
-            // 
-            this.复制toolStripMenuItem1.Name = "复制toolStripMenuItem1";
-            this.复制toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.复制toolStripMenuItem1.Text = "复制";
-            this.复制toolStripMenuItem1.Click += new System.EventHandler(this.复制toolStripMenuItem1_Click);
-            // 
-            // 粘贴ToolStripMenuItem
-            // 
-            this.粘贴ToolStripMenuItem.Name = "粘贴ToolStripMenuItem";
-            this.粘贴ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.粘贴ToolStripMenuItem.Text = "粘贴";
-            this.粘贴ToolStripMenuItem.Click += new System.EventHandler(this.粘贴ToolStripMenuItem_Click);
-            // 
-            // 清空ToolStripMenuItem
-            // 
-            this.清空ToolStripMenuItem.Name = "清空ToolStripMenuItem";
-            this.清空ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.清空ToolStripMenuItem.Text = "清空";
-            this.清空ToolStripMenuItem.Click += new System.EventHandler(this.清空ToolStripMenuItem_Click);
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -416,14 +417,16 @@
             this.BorderColor = System.Drawing.Color.White;
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1117, 694);
+            this.ClientSize = new System.Drawing.Size(1121, 689);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Main";
             this.Text = "郑州站列车运行计划辅助系统";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -432,7 +435,6 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

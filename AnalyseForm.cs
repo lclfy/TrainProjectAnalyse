@@ -3,6 +3,7 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -43,7 +44,7 @@ namespace TrainProjectAnalyse
         private void InitView()
         {
             //初始化界面与内容
-            if(EditMode == 0)
+            if (EditMode == 0)
             {
                 deleteCommand_btn.Visible = false;
             }
@@ -51,6 +52,7 @@ namespace TrainProjectAnalyse
             {
                 deleteCommand_btn.Visible = true;
             }
+            command_rtb.Text = commandText.Replace("\n","").Replace("\r","").Replace("\t","");
             analysisListView.View = View.Details;
             analysisListView.ShowGroups = false;
             string[] analysisListViewTitle = new string[] { "条目","序号","车次" , "运行状态","日期" };
@@ -162,7 +164,9 @@ namespace TrainProjectAnalyse
         {
             if(analysisListView.SelectedItems.Count != 0)
             {
-                getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                TrainModel _tm = getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                searchAndHightlight(_tm.firstTrainNum);
+                searchAndHightlight(_tm.secondTrainNum);
             }
 
         }
@@ -404,7 +408,7 @@ namespace TrainProjectAnalyse
                             }
                             IRow row = sheetCommand.GetRow(currentRowNumber);
                             ICell cellDate = row.CreateCell(0);
-                            cellDate.SetCellValue(nowDate);
+                            cellDate.SetCellValue(_allCM[0].createTime.ToString("yyyy/MM/dd"));
                             ICell cellNumber = row.CreateCell(1);
                             cellNumber.SetCellValue(commandID);
                             ICell cellFileName = row.CreateCell(2);
@@ -585,7 +589,6 @@ namespace TrainProjectAnalyse
                             dateStr = dateStr.TrimEnd(',');
                             row.GetCell(6).SetCellValue(dateStr);
 
-
                             //重新修改文件指定单元格样式
                             FileStream fs1 = File.OpenWrite(dataFileName);
                             WorkBook.Write(fs1);
@@ -667,7 +670,13 @@ namespace TrainProjectAnalyse
                             {
                                 writer.WriteLine("命令号：" + commandID + "\n" + "该命令车次为人工添加，无命令内容，可双击打开粘贴命令内容");
                             }
-
+                            //删除空行
+                            DeleteEmptyRow(0);
+                            DeleteEmptyRow(1);
+                            //重新修改文件指定单元格样式
+                            FileStream fs1 = File.OpenWrite(dataFileName);
+                            WorkBook.Write(fs1);
+                            fs1.Close();
                             writer.Close();
                             file.Close();
                         }
@@ -1008,6 +1017,53 @@ namespace TrainProjectAnalyse
             this.Close();
         }
 
+        //在原文中高亮选中的内容
+        private int searchAndHightlight(string find)
+        {
+            //type为0是长期命令，为1是高铁令
+            RichTextBox targetRTB = new RichTextBox();
+            targetRTB = command_rtb;
+            int index = 0;
+            index = targetRTB.Find(find.Trim(), 0, RichTextBoxFinds.None);
+            if(index == -1)
+            {
+                index = targetRTB.Find(find.ToLower().Trim(), 0, RichTextBoxFinds.None);
+            }
+            if(index == -1)
+            {
+                index = targetRTB.Find(Regex.Replace(find, @"[^0-9]", ""), 0, RichTextBoxFinds.None);
+            }
+            int startPos = index;
+            int nextIndex = 0;
+            while (nextIndex != startPos)//循环查找字符串，并用红色加粗12号Times New Roman标记之
+            {
+                {
+                    if (index == -1)
+                    {
+                        break;
+                    }
+                    targetRTB.SelectionStart = index;
+                    targetRTB.SelectionLength = find.Length;
+                    targetRTB.SelectionColor = Color.OrangeRed;
+                    targetRTB.SelectionFont = new Font("Times New Roman", (float)12, FontStyle.Bold);
+                    targetRTB.Focus();
+                    nextIndex = targetRTB.Find(find, index + find.Length, RichTextBoxFinds.None);
+                    if (index == -1)
+                    {
+                        index = targetRTB.Find(find.ToLower().Trim(), 0, RichTextBoxFinds.None);
+                    }
+                    if (index == -1)
+                    {
+                        index = targetRTB.Find(Regex.Replace(find, @"[^0-9]", ""), 0, RichTextBoxFinds.None);
+                    }
+                    if (nextIndex == -1)//若查到文件末尾，则重置nextIndex为初始位置的值，使其达到初始位置，顺利结束循环，否则会有异常。
+                        nextIndex = startPos;
+                    index = nextIndex;
+                }
+            }
+            return -1;
+        }
+
         private void deleteCommand_btn_Click(object sender, EventArgs e)
         {
             DeleteCommand();
@@ -1040,6 +1096,43 @@ namespace TrainProjectAnalyse
             if (selectText != "")
             {
                 Clipboard.SetText(selectText);
+            }
+        }
+
+        private void command_rtb_TextChanged(object sender, EventArgs e)
+        {
+            commandText = command_rtb.Text;
+        }
+
+        private void addDay_btn_Click(object sender, EventArgs e)
+        {
+            if (analysisListView.SelectedItems.Count != 0)
+            {
+                TrainModel _tm = getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                string title = analysisListView.SelectedItems[0].SubItems[0].Text;
+                string title1 = analysisListView.SelectedItems[0].SubItems[1].Text;
+                for (int i=0;i<_tm.effectiveDates.Count;i++)
+                {
+                    _tm.effectiveDates[i] = _tm.effectiveDates[i].AddDays(1);
+                }
+                EditComplete(_tm,1);
+                getTrainAndDateTime(title, title1);
+            }
+        }
+
+        private void minusDay_btn_Click(object sender, EventArgs e)
+        {
+            if (analysisListView.SelectedItems.Count != 0)
+            {
+                TrainModel _tm = getTrainAndDateTime(analysisListView.SelectedItems[0].SubItems[0].Text, analysisListView.SelectedItems[0].SubItems[1].Text);
+                string title = analysisListView.SelectedItems[0].SubItems[0].Text;
+                string title1 = analysisListView.SelectedItems[0].SubItems[1].Text;
+                for (int i = 0; i < _tm.effectiveDates.Count; i++)
+                {
+                    _tm.effectiveDates[i] = _tm.effectiveDates[i].AddDays(-1);
+                }
+                EditComplete(_tm, 1);
+                getTrainAndDateTime(title, title1);
             }
         }
     }

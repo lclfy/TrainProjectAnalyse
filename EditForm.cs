@@ -352,7 +352,7 @@ namespace TrainProjectAnalyse
                 //编辑
                 else if(NewOrEdit == 1)
                 {
-                    MessageBox.Show("保存成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                   // MessageBox.Show("保存成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
                     this.Close();
                 }
 

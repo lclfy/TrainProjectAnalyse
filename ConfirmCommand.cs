@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CCWin;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 
 namespace TrainProjectAnalyse
@@ -32,11 +33,21 @@ namespace TrainProjectAnalyse
         bool hasText;
         string addedTrainText;
 
+        int selectedIndex = 0;
+
         //选中项目的ID
         string selectedID;
 
-        public ConfirmCommand(IWorkbook _workbook,DateTime _dt,List<NormalCommandModel> _ncm)
+        public ConfirmCommand(IWorkbook _workbook,DateTime _dt,List<NormalCommandModel> _ncm,string _highSpeedCommand)
         {
+            if(_highSpeedCommand.Length != 0)
+            {
+                commandText = _highSpeedCommand;
+            }
+            else
+            {
+                commandText = "";
+            }
             WorkBook = _workbook;
             date = _dt;
             allCommandModel = _ncm;
@@ -45,7 +56,6 @@ namespace TrainProjectAnalyse
 
         public void RefreshData()
         {
-            commandText = "";
             addedTrainText = "";
             timeTableDate_dtp.Value = date;
             timeTable = new List<TimeTableModel>();
@@ -66,10 +76,12 @@ namespace TrainProjectAnalyse
             {
                 MessageBox.Show("时刻表文件未读取成功，请检查是否导入了正确的文件", "提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+            command_rTb.Text = commandText;
         }
 
         private void initList()
         {
+            mainList.MultiSelect = false;
             mainList.View = View.Details;
             mainList.FullRowSelect = true;
             string[] commandListViewTitle = new string[] { "序号", "车次", "运行状态", "关系命令", "运行区段", "到时", "发时", "股道" };
@@ -1107,7 +1119,7 @@ namespace TrainProjectAnalyse
                                         {
                                             IDColumn = j;
                                         }
-                                        if (row.GetCell(j).ToString().Trim().Replace("\n", "").Contains("车次"))
+                                        if (row.GetCell(j).ToString().Trim().Replace("\n", "").Equals("车次"))
                                         {
                                             trainNumColumn = j;
                                         }
@@ -1161,7 +1173,14 @@ namespace TrainProjectAnalyse
                                 if (_readingRow.GetCell(trainNumColumn).ToString().Length != 0)
                                 {
                                     string trainNumber = _readingRow.GetCell(trainNumColumn).ToString();
-                                    tempModel.firstTrainNumber = trainNumber.Split('/')[0];
+
+                                    if (trainNumber.Contains("G818"))
+                                    {
+                                        int a = 0;
+                                        string _id = _readingRow.GetCell(IDColumn).ToString();
+                                       string ss = _readingRow.GetCell(startStopStationColumn).ToString();
+                                    }
+                                        tempModel.firstTrainNumber = trainNumber.Split('/')[0];
                                     if (trainNumber.Split('/').Length > 1)
                                     {
                                         string[] trainWithDoubleNumber = trainNumber.Split('/');
@@ -1238,6 +1257,13 @@ namespace TrainProjectAnalyse
         //将时刻表与模型相匹配
         private void matchTimeTableAndCommand(bool hasHighSpeedCommand = false)
         {
+            //先把时刻表模型里的运行状态清空
+            foreach(TimeTableModel _tempTTM in timeTable)
+            {
+                _tempTTM.containedCommand = "";
+                _tempTTM.streamStatus = -1;
+            }
+
             //有高铁模型的话，加入高铁模型一起对比
             foreach(TimeTableModel _ttm in timeTable)
             {
@@ -1295,19 +1321,20 @@ namespace TrainProjectAnalyse
                 {
                     foreach(TrainModel _tm in _ncm.allTrainModel)
                     {
+                        if (_ttm.firstTrainNumber.Contains("K177"))
+                        {
+                            int a = 0;
+                            if (_tm.firstTrainNum.Contains("K177"))
+                            {
+                                int b = 0;
+                            }
+                        }
                         if (_ttm.firstTrainNumber.Trim().Equals(_tm.firstTrainNum)||
-                            _ttm.firstTrainNumber.Trim().Equals(_tm.secondTrainNum) ||
+                            (_ttm.firstTrainNumber.Trim().Equals(_tm.secondTrainNum)&& _tm.secondTrainNum.Length!=0) ||
                             _ttm.secondTrainNumber.Trim().Equals(_tm.firstTrainNum) ||
-                            _ttm.secondTrainNumber.Trim().Equals(_tm.secondTrainNum))
+                            (_ttm.secondTrainNumber.Trim().Equals(_tm.secondTrainNum)&& _tm.secondTrainNum.Length != 0))
                         {//相同车次
                             //找时间
-                            if ((_ttm.secondTrainNumber.Length == 0 &&
-                                    _tm.secondTrainNum.Length == 0) ||
-                                   (_ttm.firstTrainNumber.Length == 0 &&
-                                    _tm.firstTrainNum.Length == 0))
-                            {
-                                continue;
-                            }
                             //双车次赋值
                             if(_tm.secondTrainNum.Length !=0 && _ttm.secondTrainNumber.Length == 0)
                             {
@@ -1363,6 +1390,8 @@ namespace TrainProjectAnalyse
             showResult();
         }
 
+        //0停运，1恢复开行，其他为高铁令的开行，-1未定义
+        //高铁令无内容不开，-2
         private string DetectStreamStatus(int streamStatus)
         {
             string streamStatusString = "";
@@ -1371,8 +1400,17 @@ namespace TrainProjectAnalyse
                 case 0:
                     streamStatusString = "停运";
                     break;
+                case 1:
+                    streamStatusString = "开行";
+                    break;
+                case -1:
+                    streamStatusString = "开行(默认)";
+                    break;
+                case -2:
+                    streamStatusString = "高铁停运";
+                    break;
                 default:
-                    streamStatusString = "运行";
+                    streamStatusString = "开行";
                     break;
             }
             return streamStatusString;
@@ -1521,6 +1559,14 @@ namespace TrainProjectAnalyse
             }
             int index = 0;
             index = targetRTB.Find(find,0, RichTextBoxFinds.WholeWord);
+            if (index == -1)
+            {
+                index = targetRTB.Find(find.ToLower().Trim(), 0, RichTextBoxFinds.WholeWord);
+            }
+            if (index == -1)
+            {
+                index = targetRTB.Find(Regex.Replace(find, @"[^0-9]", ""), 0, RichTextBoxFinds.None);
+            }
             int startPos = index;
             int nextIndex = 0;
             while (nextIndex != startPos)//循环查找字符串，并用红色加粗12号Times New Roman标记之
@@ -1571,6 +1617,69 @@ namespace TrainProjectAnalyse
 
         }
 
+        //输出文件到桌面
+        private void OutPutExcel()
+        {
+            IWorkbook workbook = new HSSFWorkbook();
+            ISheet sheet = workbook.CreateSheet(date.ToString("yyyy年MM月dd日"));
+            IRow row = sheet.CreateRow(0);
+                row.CreateCell(0).SetCellValue("序号");
+                row.CreateCell(1).SetCellValue("车次");
+                row.CreateCell(2).SetCellValue("运行状态");
+                row.CreateCell(3).SetCellValue("关系命令");
+                row.CreateCell(4).SetCellValue("运行区段");
+                row.CreateCell(5).SetCellValue("到时");
+                row.CreateCell(6).SetCellValue("发时");
+            row.CreateCell(7).SetCellValue("股道");
+            for (int i = 0; i < timeTable.Count; i++)
+            {
+                IRow dataRow = sheet.CreateRow(i + 1);
+                TimeTableModel _ttm = timeTable[i];
+                dataRow.CreateCell(0).SetCellValue(_ttm.ID);
+                if(_ttm.secondTrainNumber.Length != 0)
+                {
+                    dataRow.CreateCell(1).SetCellValue(_ttm.firstTrainNumber + "/" + _ttm.secondTrainNumber);
+                }
+                else
+                {
+                    dataRow.CreateCell(1).SetCellValue(_ttm.firstTrainNumber);
+                }
+                dataRow.CreateCell(2).SetCellValue(DetectStreamStatus(_ttm.streamStatus));
+                if (_ttm.containedCommand.Length != 0 && !_ttm.containedCommand.Contains("高铁令"))
+                {
+                    string command = _ttm.containedCommand.Substring(8, 5) + "(" + _ttm.containedCommand.Substring(0, 8) + ")";
+                    dataRow.CreateCell(3).SetCellValue(command);
+                }
+                else if (_ttm.containedCommand.Contains("高铁令"))
+                {
+                    dataRow.CreateCell(3).SetCellValue("高铁令");
+                }
+                dataRow.CreateCell(4).SetCellValue(_ttm.startStopStation);
+                dataRow.CreateCell(5).SetCellValue(_ttm.stopTime);
+                dataRow.CreateCell(6).SetCellValue(_ttm.startTime);
+                dataRow.CreateCell(7).SetCellValue(_ttm.trackNum);
+            }
+            FileStream fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("yyyy年MM月dd日-列车运行计划") + ".xls");
+            //重新修改文件指定单元格样式
+            //FileStream fs1 = File.OpenWrite(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("yyyy年MM月dd日列车运行计划") + ".xls");
+            workbook.Write(fs);
+            fs.Close();
+            MessageBox.Show("已保存至" + Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("yyyy年MM月dd日-列车运行计划") + ".xls", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo();
+            //info.WorkingDirectory = Application.StartupPath;
+            info.FileName = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + DateTime.Now.ToString("yyyy年MM月dd日-列车运行计划") + ".xls";
+            info.Arguments = "";
+            try
+            {
+                System.Diagnostics.Process.Start(info);
+            }
+            catch (System.ComponentModel.Win32Exception we)
+            {
+                MessageBox.Show(this, we.Message);
+                return;
+            }
+        }
+
         private void commandID_list_SelectedIndexChanged(object sender, EventArgs e)
         {
             {
@@ -1617,6 +1726,8 @@ namespace TrainProjectAnalyse
                 startBtnCheck();
                 analyseCommand();
                 matchTimeTableAndCommand(true);
+                Main _m = (Main)this.Owner;
+                _m.highSpeedCommand = commandText;
             }
             else
             {
@@ -1714,9 +1825,18 @@ namespace TrainProjectAnalyse
 
         private void mainList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            foreach(ListViewItem _lvi in mainList.Items)
+            {
+                _lvi.ForeColor = Color.Black;
+            }
             //找出相应的命令
             if(mainList.SelectedItems.Count != 0)
             {
+                if(mainList.FocusedItem != null)
+                {
+                    selectedIndex = mainList.FocusedItem.Index;
+                }
+
                 //高亮显示，提取双车次
                 string firstTrainNumber = mainList.SelectedItems[0].SubItems[1].Text;
                 string secondTrainNumber = "";
@@ -1746,6 +1866,8 @@ namespace TrainProjectAnalyse
             {
                 OriginalText_rtb.Text = "";
             }
+            mainList.Items[selectedIndex].Focused = true;
+            mainList.Items[selectedIndex].ForeColor = Color.DodgerBlue;
 
         }
 
@@ -1810,6 +1932,11 @@ namespace TrainProjectAnalyse
             {
                 Clipboard.SetText(selectText);
             }
+        }
+
+        private void save_btn_Click(object sender, EventArgs e)
+        {
+            OutPutExcel();
         }
     }
 }

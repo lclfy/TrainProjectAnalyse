@@ -26,6 +26,8 @@ namespace TrainProjectAnalyse
         string ExcelFile;
         bool hasFilePath = false;
 
+        public string highSpeedCommand;
+
         public Main()
         {
             InitializeComponent();
@@ -38,6 +40,7 @@ namespace TrainProjectAnalyse
             today_rb.Select();
             ExcelFile = "";
             dataAnalyse_btn.Enabled = false;
+            highSpeedCommand = "";
         }
 
         //刷新内容
@@ -98,7 +101,6 @@ namespace TrainProjectAnalyse
             //先刷新总列表，以命令名为group名，group内为命令里的车
             commandListView.Items.Clear();
             commandListView.Groups.Clear();
-        
             this.commandListView.BeginUpdate();
             bool hasTrains = true;
             //先倒着把分组加进去，展示的时候就是时间倒序的了
@@ -188,7 +190,13 @@ namespace TrainProjectAnalyse
                 int nullCounter = 0;
                 if (row.GetCell(0) != null)
                 {
-                    _cm.createTime = DateTime.Parse(row.GetCell(0).ToString());
+                    DateTime _tempDT = new DateTime();
+                    string date = row.GetCell(0).ToString();
+                    if(DateTime.TryParse(date, out _tempDT))
+                    {
+                        _cm.createTime = _tempDT;
+                    }
+
                 }
                 else
                 {
@@ -293,9 +301,15 @@ namespace TrainProjectAnalyse
                 {
                     List<DateTime> _dt = new List<DateTime>();
                     string[] allDates = row.GetCell(6).ToString().Split(',');
+
                     foreach(string _date in allDates)
                     {
-                        _dt.Add(DateTime.Parse(_date));
+                        DateTime _tempDT = new DateTime();
+                        if(DateTime.TryParse(_date, out _tempDT))
+                        {
+                            _dt.Add(_tempDT);
+                        }
+
                     }
                     _tm.effectiveDates = _dt;
                 }
@@ -342,25 +356,121 @@ namespace TrainProjectAnalyse
             }
         }
 
+        private int searchAndHightlight(string find)
+        {
+            //type为0是长期命令，为1是高铁令
+            RichTextBox targetRTB = new RichTextBox();
+           targetRTB = OriginalText_rtb;
+            int index = 0;
+            index = targetRTB.Find(find, 0, RichTextBoxFinds.None);
+            if (index == -1)
+            {
+                index = targetRTB.Find(find.ToUpper().Trim(), 0, RichTextBoxFinds.None);;
+            }
+            if (index == -1)
+            {
+                string textOnlyD = Regex.Replace(find, @"[^0-9]", "");
+                index = targetRTB.Find(textOnlyD, 0, RichTextBoxFinds.None);
+            }
+            int startPos = index;
+            int nextIndex = 0;
+            while (nextIndex != startPos)//循环查找字符串，并用红色加粗12号Times New Roman标记之
+            {
+                {
+                    if (index == -1)
+                    {
+                        break;
+                    }
+                    targetRTB.SelectionStart = index;
+                    targetRTB.SelectionLength = find.Length;
+                    targetRTB.SelectionColor = Color.OrangeRed;
+                    targetRTB.SelectionFont = new Font("Times New Roman", (float)12, FontStyle.Bold);
+                    targetRTB.Focus();
+                    nextIndex = targetRTB.Find(find, index + find.Length, RichTextBoxFinds.None);
+                    if (index == -1)
+                    {
+                        index = targetRTB.Find(find.ToUpper().Trim(), 0, RichTextBoxFinds.None);
+                    }
+                    if (index == -1)
+                    {
+                        index = targetRTB.Find(Regex.Replace(find, @"[^0-9]", ""), 0, RichTextBoxFinds.None);
+                    }
+                    if (nextIndex == -1)//若查到文件末尾，则重置nextIndex为初始位置的值，使其达到初始位置，顺利结束循环，否则会有异常。
+                        nextIndex = startPos;
+                    index = nextIndex;
+                }
+            }
+            return -1;
+        }
+
         //读取粘贴的命令
         private void getCommands(string commandText)
         {
+            string commandID = "";
+            string date = "";
             //去标题
             commandText = commandText.Replace("1.", "").Replace("2.", "").Replace("3.", "").Replace("4.", "").Replace("5.", "").Replace("6.", "");
             //去符号
-            commandText = commandText.Replace("，", "").Replace("。", "").Replace("、", "").Replace("（", "").Replace("）", "").Replace("：","").Replace("~","").Replace("～","").Replace("〜","").Replace("—","").Replace("–","");
-            commandText = commandText.Replace(",", "").Replace(".", "").Replace("(", "").Replace(")", "").Replace(":", "");
-            string[] splitedCommandText = commandText.Split(new[] { "--第" }, StringSplitOptions.None);
-            for(int sentence = 0; sentence < splitedCommandText.Length; sentence++)
+            commandText = commandText.Replace("，", "、").Replace(",","、").Replace("。", "").Replace("（", "").Replace("）", "").Replace("：","").Replace("~","").Replace("～","").Replace("〜","").Replace("—","").Replace("–","");
+            commandText = commandText.Replace(".", "").Replace("(", "").Replace(")", "").Replace(":", "");
+            string[] splitedText =  commandText.Split(new[] { "--第" }, StringSplitOptions.None);
+            List<string> splitedCommandText = new List<string>();
+            for(int k = 0; k < splitedText.Length; k++)
             {
-                splitedCommandText[sentence] = splitedCommandText[sentence].Replace("命令来源", "").Replace("命令外发", "");
+                splitedCommandText.Add(splitedText[k]);
+            }
+            //表格式
+            if (splitedCommandText.Count < 2)
+            {
+                //内容删除，再重新进行添加
+                splitedCommandText.Clear();
+                //以\n数字\t进行切割，一位或者两位数字或者多位数字
+                Regex.Split(Regex.Split(commandText, @"\n\d\t")[Regex.Split(commandText, @"\n\d\t").Length - 1], @"\n\d\d\t");
+                string[] tempTexts;
+                splitedText = Regex.Split(commandText, @"\n\d+\t");
+                for(int k = 0; k < splitedText.Length; k++)
+                {
+                    splitedCommandText.Add(splitedText[k]);
+                }
+                //表格格式有号头和创建时间，添加上
+                string title = splitedCommandText[0];
+                if(title.Contains("第") && title.Contains("号"))
+                {
+                    commandID = title.Split('第')[1].Split('号')[0].Replace("\t","");
+                }
+                if(title.Contains("年") && title.Contains("月") && title.Contains("日"))
+                {
+                    Regex r = new Regex(@"\d+年\d+月\d+日");
+                    bool ismatch = r.IsMatch(title);
+                    MatchCollection mc = r.Matches(title);
+                    string result = string.Empty;
+                    for (int i = 0; i < mc.Count; i++)
+                    {
+                        result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+                    }
+                    date = result;
+                }
+            }
+            for(int sentence = 0; sentence < splitedCommandText.Count; sentence++)
+            {
+                splitedCommandText[sentence] = splitedCommandText[sentence].Replace("命令来源", "").Replace("命令外发", "").Replace("\n","").Replace("\t","");
             }
             //对每条命令进行从左至右读取
             List<NormalCommandModel> _allCM = new List<NormalCommandModel>();
 
-            for (int count = 0; count < splitedCommandText.Length; count++)
+            for (int count = 0; count < splitedCommandText.Count; count++)
             {
                 NormalCommandModel _cm = new NormalCommandModel();
+                _cm.commandID = commandID;
+                DateTime _dtCreate = new DateTime();
+                bool gotTime = false;
+                if(DateTime.TryParse(date,out _dtCreate))
+                {
+                    gotTime = true;
+                    _cm.createTime = _dtCreate;
+                    _cm.ID = _dtCreate.ToString("yyyyMMdd");
+                }
+
                 //当出现“停运”，“恢复开行”时，将前面的全部存起来
                 string currentYear = "";
                 string currentMonth = "";
@@ -396,7 +506,21 @@ namespace TrainProjectAnalyse
                     //先找年月日
                     //不含“至”
                     //当出现新日期时，存一个旧日期模型，找到停运信息后，统一添加
-                    if (appendedStr.Contains("日") && i+1 < _commandChar.Length && !_commandChar[i+1].ToString().Contains("至"))
+                    //xx日至xx日
+                    //xx至xx日
+                    //xx-xx日
+                    //xx日-xx日
+                    string appendNextChar = "";
+                    if (i + 1 < _commandChar.Length)
+                    {
+                        appendNextChar = appendedStr + _commandChar[i + 1].ToString().Replace(",", "、");
+                    }
+                    if (appendedStr.Contains("日") &&
+                        !appendNextChar.Contains("日至") &&
+                        !appendNextChar.Contains("日-") ||
+                        Regex.IsMatch(appendNextChar,@"\d+[日][、]")||
+                        Regex.IsMatch(appendNextChar, @"\d+[月]\d+[、]")||
+                        Regex.IsMatch(appendNextChar, @"[、]\d+[、]"))
                     {//把找到的日期都存入，导入后清空，如果有“至”，则找结束日，中间的日期全部加上
                      //当已经存储了模型时，又发现了<首个>新的时间，则时间存储器清空
                         if (hasGotTrains)
@@ -413,7 +537,8 @@ namespace TrainProjectAnalyse
                                 Regex.IsMatch(_dateChar[d].ToString(), @"^[年]+$") ||
                                 Regex.IsMatch(_dateChar[d].ToString(), @"^[月]+$") ||
                                 Regex.IsMatch(_dateChar[d].ToString(), @"^[日]+$") ||
-                                Regex.IsMatch(_dateChar[d].ToString(), @"^[至]+$"))
+                                Regex.IsMatch(_dateChar[d].ToString(), @"^[至]+$")||
+                                Regex.IsMatch(_dateChar[d].ToString(), @"^[-]+$"))
                             {
                                 _date = _date + _dateChar[d].ToString();
                             }
@@ -473,7 +598,10 @@ namespace TrainProjectAnalyse
                         int a1 = 0;
                         appendedStr = "";
                     }
-                     else if(appendedStr.Contains("日") && i + 1 < _commandChar.Length && _commandChar[i + 1].ToString().Contains("至"))
+                     if(appendNextChar.Contains("日至") ||
+                        appendNextChar.Contains("日-") ||
+                        Regex.IsMatch(appendNextChar, @"[日][-]") ||
+                        Regex.IsMatch(appendNextChar, @"\d+-"))
                     {
                         //如果下一个字是“至”，则再找到结束日期
                         {//往后找到下一个“日”，填入strdate，如果没有下一个日期，则找到“次”后停止，但不添加至内容
@@ -487,11 +615,19 @@ namespace TrainProjectAnalyse
                             }
                             
                             string _tempStop = "";
+                            if (!appendedStr.Contains("日"))
+                            {
+                                appendedStr += "日";
+                            }
                             while (!_commandChar[i+1].Equals('日') &&
                                 !_commandChar[i+1].Equals('次'))
                             {
                                 i = i + 1;
                                 _tempStop = _tempStop + _commandChar[i];
+                                if(i+1== _commandChar.Length)
+                                {
+                                    break;
+                                }
                             }
                             if (!_tempStop.Contains("次"))
                             {
@@ -519,7 +655,8 @@ namespace TrainProjectAnalyse
                                     Regex.IsMatch(_dateChar[d].ToString(), @"^[年]+$") ||
                                     Regex.IsMatch(_dateChar[d].ToString(), @"^[月]+$") ||
                                     Regex.IsMatch(_dateChar[d].ToString(), @"^[日]+$") ||
-                                    Regex.IsMatch(_dateChar[d].ToString(), @"^[至]+$"))
+                                    Regex.IsMatch(_dateChar[d].ToString(), @"^[至]+$") ||
+                                    _dateChar[d].ToString().Equals("-"))
                                 {
                                     _date = _date + _dateChar[d].ToString();
                                 }
@@ -592,9 +729,57 @@ namespace TrainProjectAnalyse
                         }
                         appendedStr = "";
                         //把前面添加的模型的停运状态都填上
-                        foreach(TrainModel _tm in _tempModels)
+                        //如果出现相同的车次，后面出现的合并一下
+                        TrainModel _comparedModel = new TrainModel();
+                        bool firstOne = true;
+                        int allModelsCount = _tempModels.Count;
+                        for(int k =0;k<allModelsCount;k++)
                         {
+                            TrainModel _tm = _tempModels[k];
+                            if (_tm.firstTrainNum.Equals(_comparedModel.firstTrainNum)||
+                                _tm.firstTrainNum.Equals(_comparedModel.secondTrainNum))
+                            {
+                                foreach(DateTime _dt in _tm.effectiveDates)
+                                {
+                                    bool hasGotSameTime = false;
+                                    foreach(DateTime _dtCompared in _comparedModel.effectiveDates)
+                                    {
+                                        if(_dtCompared.Year==_dt.Year&&
+                                            _dtCompared.Month == _dt.Month &&
+                                            _dtCompared.Day == _dt.Day)
+                                        {
+                                            hasGotSameTime = true;
+                                            break;
+                                        }
+                                    }
+                                    if (hasGotSameTime)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        //没有相同时间，赋值
+                                        _comparedModel.effectiveDates.Add(_dt);
+                                    }
+                                }
+                                //时间赋值过去
+                                //有相同的，不添加
+                                _tempModels.Remove(_tm);
+                                allModelsCount = allModelsCount - 1;
+                            }
+                            if (firstOne)
+                            {
+                                _comparedModel = _tm;
+                                firstOne = false;
+                            }
                             _tm.streamStatus = currentStatus;
+                            //命令和创建日期也填上
+                            _tm.commandID = commandID;
+                            if (gotTime)
+                            {
+                                _tm.createTime = _dtCreate;
+                                _tm.ID = _dtCreate.ToString("yyyyMMdd");
+                            }
                         }
                         _cm.allTrainModel = _tempModels;
                         //车模型清空，临时储存器清空，其他不变
@@ -645,35 +830,53 @@ namespace TrainProjectAnalyse
         {
             string startdate = "";
             string stopdate = "";
-            startdate = _date.Split('至')[0];
-            stopdate = _date.Split('至')[1];
-            if (!startdate.Contains("年") ||
-                !startdate.Contains("月") ||
-                !startdate.Contains("日"))
+            try
+            {
+                if (_date.Contains("至"))
+                {
+                    startdate = _date.Split('至')[0];
+                    stopdate = _date.Split('至')[1];
+                }
+                else if (_date.Contains("-"))
+                {
+                    startdate = _date.Split('-')[0];
+                    stopdate = _date.Split('-')[1];
+                }
+
+                if (!startdate.Contains("年") ||
+                    !startdate.Contains("月") ||
+                    !startdate.Contains("日"))
+                {
+                    return new List<DateTime>();
+                }
+                if (stopdate.Contains("年"))
+                {
+
+                }
+                else if (stopdate.Contains("月"))
+                {
+                    stopdate = startdate.Split('年')[0] + "年" + stopdate;
+                }
+                else if (stopdate.Contains("日"))
+                {
+                    stopdate = startdate.Split('月')[0] + "月" + stopdate;
+                }
+                List<DateTime> li = new List<DateTime>();
+                DateTime time1 = Convert.ToDateTime(startdate);
+                DateTime time2 = Convert.ToDateTime(stopdate);
+                while (time1 <= time2 && time1.Year > 1990)
+                {
+                    li.Add(time1);
+                    time1 = time1.AddDays(1);
+                }
+                return li;
+            }
+            catch(Exception e)
             {
                 return new List<DateTime>();
             }
-            if (stopdate.Contains("年"))
-            {
-                
-            }
-            else if (stopdate.Contains("月"))
-            {
-                stopdate =  startdate.Split('年')[0] + "年" + stopdate;
-            }
-            else if (stopdate.Contains("日"))
-            {
-                stopdate = startdate.Split('月')[0] + "月" + stopdate;
-            }
-            List<DateTime> li = new List<DateTime>();
-            DateTime time1 = Convert.ToDateTime(startdate);
-            DateTime time2 = Convert.ToDateTime(stopdate);
-            while (time1 <= time2&& time1.Year >1990)
-            {
-                li.Add(time1);
-                time1 = time1.AddDays(1);
-            }
-            return li;
+
+            return new List<DateTime>();
         }
 
 
@@ -843,6 +1046,9 @@ namespace TrainProjectAnalyse
                 TrainModel _tempTM = GetTrainFromSelect(_tempCM,commandListView.SelectedItems[0].SubItems[0].Text);
                 //填充时间
                 RefreshDateList(_tempTM);
+                //高亮显示
+                searchAndHightlight(_tempTM.firstTrainNum);
+                searchAndHightlight(_tempTM.secondTrainNum);
             }
         }
 
@@ -888,7 +1094,7 @@ namespace TrainProjectAnalyse
                 List<NormalCommandModel> _listCM = new List<NormalCommandModel>();
                 _listCM.Add(_tempCM);
                 //最后参数为1则为编辑命令模式，为0为添加命令模式
-                AnalyseForm _af = new AnalyseForm(_listCM, commandText, WorkBook, 1);
+                AnalyseForm _af = new AnalyseForm(_listCM, OriginalText_rtb.Text, WorkBook, 1);
                 _af.Owner = this;
                 _af.Show();
             }
@@ -999,6 +1205,7 @@ namespace TrainProjectAnalyse
                     foreach (string fileName in openFileDialog1.FileNames)
                     {
                         ExcelFile = fileName;
+                        fileCount++;
                     }
                      this.TimeTableFileName_lbl.Text = "已选择：" + fileCount + "个文件";
                     hasFilePath = true;
@@ -1023,7 +1230,7 @@ namespace TrainProjectAnalyse
                 _dt = DateTime.Today.AddDays(1).Date;
             }
             IWorkbook workbook = new HSSFWorkbook(new FileStream(ExcelFile, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
-            ConfirmCommand _ccForm = new ConfirmCommand(workbook,_dt,allCurrentModels);
+            ConfirmCommand _ccForm = new ConfirmCommand(workbook,_dt,allCurrentModels,highSpeedCommand);
             _ccForm.Owner = this;
             _ccForm.Show();
         }
