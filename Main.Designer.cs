@@ -56,6 +56,10 @@
             this.dataAnalyse_btn = new CCWin.SkinControl.SkinButton();
             this.importTimeTable_btn = new CCWin.SkinControl.SkinButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.deleteCM_btn = new CCWin.SkinControl.SkinButton();
+            this.deleteCMDays_txt = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -278,7 +282,7 @@
             this.DateListView.HideSelection = false;
             this.DateListView.Location = new System.Drawing.Point(272, 60);
             this.DateListView.Name = "DateListView";
-            this.DateListView.Size = new System.Drawing.Size(116, 481);
+            this.DateListView.Size = new System.Drawing.Size(116, 482);
             this.DateListView.TabIndex = 44;
             this.DateListView.UseCompatibleStateImageBehavior = false;
             // 
@@ -403,11 +407,66 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.OrangeRed;
-            this.label1.Location = new System.Drawing.Point(987, 638);
+            this.label1.Location = new System.Drawing.Point(979, 644);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(98, 17);
+            this.label1.Size = new System.Drawing.Size(112, 17);
             this.label1.TabIndex = 6;
-            this.label1.Text = "build01-202110";
+            this.label1.Text = "build01-20211025";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.ForeColor = System.Drawing.Color.OrangeRed;
+            this.label4.Location = new System.Drawing.Point(656, 644);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(289, 17);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "问题反馈请联系吕主任，或（17638570597罗思聪）";
+            // 
+            // deleteCM_btn
+            // 
+            this.deleteCM_btn.BackColor = System.Drawing.Color.Transparent;
+            this.deleteCM_btn.BaseColor = System.Drawing.Color.Crimson;
+            this.deleteCM_btn.BorderColor = System.Drawing.Color.Crimson;
+            this.deleteCM_btn.ControlState = CCWin.SkinClass.ControlState.Normal;
+            this.deleteCM_btn.DownBack = null;
+            this.deleteCM_btn.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteCM_btn.ForeColor = System.Drawing.Color.White;
+            this.deleteCM_btn.Location = new System.Drawing.Point(361, 644);
+            this.deleteCM_btn.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.deleteCM_btn.MouseBack = null;
+            this.deleteCM_btn.Name = "deleteCM_btn";
+            this.deleteCM_btn.NormlBack = null;
+            this.deleteCM_btn.Size = new System.Drawing.Size(116, 35);
+            this.deleteCM_btn.TabIndex = 45;
+            this.deleteCM_btn.Text = "清理命令";
+            this.deleteCM_btn.UseVisualStyleBackColor = false;
+            this.deleteCM_btn.Click += new System.EventHandler(this.deleteCM_btn_Click);
+            // 
+            // deleteCMDays_txt
+            // 
+            this.deleteCMDays_txt.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteCMDays_txt.Location = new System.Drawing.Point(482, 647);
+            this.deleteCMDays_txt.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.deleteCMDays_txt.Name = "deleteCMDays_txt";
+            this.deleteCMDays_txt.Size = new System.Drawing.Size(44, 29);
+            this.deleteCMDays_txt.TabIndex = 45;
+            this.deleteCMDays_txt.Text = "30";
+            this.deleteCMDays_txt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.deleteCMDays_txt.TextChanged += new System.EventHandler(this.deleteCMDays_txt_TextChanged);
+            this.deleteCMDays_txt.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.deleteCMDays_txt_KeyPress);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.Location = new System.Drawing.Point(528, 651);
+            this.label5.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(93, 20);
+            this.label5.TabIndex = 45;
+            this.label5.Text = "天之前的命令";
             // 
             // Main
             // 
@@ -417,7 +476,11 @@
             this.BorderColor = System.Drawing.Color.White;
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1121, 689);
+            this.ClientSize = new System.Drawing.Size(1126, 702);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.deleteCMDays_txt);
+            this.Controls.Add(this.deleteCM_btn);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -468,6 +531,10 @@
         private System.Windows.Forms.ToolStripMenuItem 复制toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 粘贴ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 清空ToolStripMenuItem;
+        private System.Windows.Forms.Label label4;
+        private CCWin.SkinControl.SkinButton deleteCM_btn;
+        private System.Windows.Forms.TextBox deleteCMDays_txt;
+        private System.Windows.Forms.Label label5;
     }
 }
 

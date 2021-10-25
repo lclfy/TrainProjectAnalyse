@@ -258,8 +258,6 @@ namespace TrainProjectAnalyse
                 }
             }
 
-
-            if(MessageBox.Show("要添加的日期为：\n"+allDates+"是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
             {
                 //判断是否有重复日期
                 string sameDates = "";
@@ -295,7 +293,6 @@ namespace TrainProjectAnalyse
         {
             //添加单一日期
             DateTime _date = addSingleTime_dtp.Value;
-            if (MessageBox.Show("要添加的日期为：\n" + _date.ToString("yyyy/MM/dd") + "\n是否添加", "确认信息", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) == DialogResult.OK)
             {
                 //判断是否有重复日期
                 string sameDates = "";

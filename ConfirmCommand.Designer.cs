@@ -48,6 +48,8 @@
             this.复制toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.粘贴ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.清空ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBox0 = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -190,7 +192,7 @@
             this.outputTB.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.outputTB.Name = "outputTB";
             this.outputTB.ReadOnly = true;
-            this.outputTB.Size = new System.Drawing.Size(334, 153);
+            this.outputTB.Size = new System.Drawing.Size(332, 153);
             this.outputTB.TabIndex = 12;
             this.outputTB.Text = "";
             // 
@@ -207,7 +209,7 @@
             this.command_rTb.ContextMenuStrip = this.contextMenuStrip1;
             this.command_rTb.Location = new System.Drawing.Point(6, 22);
             this.command_rTb.Name = "command_rTb";
-            this.command_rTb.Size = new System.Drawing.Size(334, 354);
+            this.command_rTb.Size = new System.Drawing.Size(332, 354);
             this.command_rTb.TabIndex = 0;
             this.command_rTb.Text = "";
             this.command_rTb.TextChanged += new System.EventHandler(this.highSpeedCommand_rtb_TextChanged);
@@ -243,6 +245,30 @@
             this.清空ToolStripMenuItem.Text = "清空";
             this.清空ToolStripMenuItem.Click += new System.EventHandler(this.清空ToolStripMenuItem_Click);
             // 
+            // checkBox0
+            // 
+            this.checkBox0.AutoSize = true;
+            this.checkBox0.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.checkBox0.Location = new System.Drawing.Point(417, 653);
+            this.checkBox0.Name = "checkBox0";
+            this.checkBox0.Size = new System.Drawing.Size(84, 24);
+            this.checkBox0.TabIndex = 43;
+            this.checkBox0.Text = "显示停运";
+            this.checkBox0.UseVisualStyleBackColor = true;
+            this.checkBox0.CheckedChanged += new System.EventHandler(this.checkBox0_CheckedChanged);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.checkBox1.Location = new System.Drawing.Point(507, 653);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(84, 24);
+            this.checkBox1.TabIndex = 44;
+            this.checkBox1.Text = "显示开行";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // ConfirmCommand
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -252,6 +278,8 @@
             this.CaptionBackColorBottom = System.Drawing.Color.White;
             this.CaptionBackColorTop = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1292, 697);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.checkBox0);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -266,6 +294,7 @@
             this.groupBox4.PerformLayout();
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -289,5 +318,7 @@
         private System.Windows.Forms.ToolStripMenuItem 粘贴ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 清空ToolStripMenuItem;
         private CCWin.SkinControl.SkinButton save_btn;
+        private System.Windows.Forms.CheckBox checkBox0;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

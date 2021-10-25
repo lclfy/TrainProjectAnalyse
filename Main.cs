@@ -20,6 +20,7 @@ namespace TrainProjectAnalyse
         string commandText = "";
         //避免重复打开txt文件，只在变化时打开
         string currentTXTFileName = "";
+        string dataFileName = "";
         IWorkbook WorkBook;
 
         //时刻表Excel文件
@@ -46,7 +47,6 @@ namespace TrainProjectAnalyse
         //刷新内容
         public void RefreshUI()
         {
-
             refreshData();
             WorkBook = loadExcel();
             if (WorkBook != null)
@@ -334,6 +334,7 @@ namespace TrainProjectAnalyse
             //读取文件
             IWorkbook workBook;
             string fileName = Application.StartupPath + "\\Data.xls";
+            dataFileName = fileName;
             FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
             try
             {
@@ -488,7 +489,8 @@ namespace TrainProjectAnalyse
                     !splitedCommandText[count].Contains("停开") &&
                     !splitedCommandText[count].Contains("停") &&
                     !splitedCommandText[count].Contains("恢复") &&
-                    !splitedCommandText[count].Contains("开行"))
+                    !splitedCommandText[count].Contains("开行")&&
+                     !splitedCommandText[count].Contains("加开"))
                 {
                     continue;
                 }
@@ -515,6 +517,12 @@ namespace TrainProjectAnalyse
                     {
                         appendNextChar = appendedStr + _commandChar[i + 1].ToString().Replace(",", "、");
                     }
+                    //中国铁路郑州局集团公司客运部技术科工作单2021年第 10-18-01号内容：1、由于水害影响车底交路: 2021年10月19日至10月25日郑州开D7854次、长治东开D7853/6次停运。   
+                    //读取出来是2021年10-18-012021年10月19日至10月25日
+                    //把dd-dd-dd的删除
+                    Regex.Replace(appendNextChar, @"\d+[-]\d+[-]\d+", "");
+                    //1因客流需要，根据南昌局集团公司申请，准：    2021年10月22日至24日、29日至31日南昌西开G2044次、郑州东开G2043次恢复开行，列车使用CRH380A非统型单组担当，定员480人。    
+
                     if (appendedStr.Contains("日") &&
                         !appendNextChar.Contains("日至") &&
                         !appendNextChar.Contains("日-") ||
@@ -542,6 +550,31 @@ namespace TrainProjectAnalyse
                             {
                                 _date = _date + _dateChar[d].ToString();
                             }
+                        }
+                        //把“年”之前的数字去掉
+                        if (_date.Contains("年") )
+                        {
+                            Regex r;
+                            if (_date.Contains("月"))
+                            {
+                                r = new Regex(@"\d\d\d\d年\d+月");
+                            }
+                            else if (_date.Contains("日"))
+                            {
+                                r = new Regex(@"\d\d\d\d年\d+月\d+日");
+                            }
+                            else
+                            {
+                                r = new Regex(@"\d\d\d\d年");
+                            }
+                            bool ismatch = r.IsMatch(_date);
+                            MatchCollection mc = r.Matches(_date);
+                            string result = string.Empty;
+                            for (int m = 0;m < mc.Count; m++)
+                            {
+                                result += mc[m];//匹配结果是完整的数字，此处可以不做拼接的
+                            }
+                            _date = result;
                         }
                         //不含年月的，从上一个获取的年月中找，还没有的话再设定为当前年月
                         if (!_date.Contains("月"))
@@ -598,7 +631,7 @@ namespace TrainProjectAnalyse
                         int a1 = 0;
                         appendedStr = "";
                     }
-                     if(appendNextChar.Contains("日至") ||
+                    if (appendNextChar.Contains("日至") ||
                         appendNextChar.Contains("日-") ||
                         Regex.IsMatch(appendNextChar, @"[日][-]") ||
                         Regex.IsMatch(appendNextChar, @"\d+-"))
@@ -615,6 +648,7 @@ namespace TrainProjectAnalyse
                             }
                             
                             string _tempStop = "";
+
                             if (!appendedStr.Contains("日"))
                             {
                                 appendedStr += "日";
@@ -637,20 +671,76 @@ namespace TrainProjectAnalyse
                             string _date = "";
                             List<DateTime> _allDates = new List<DateTime>();
 
-                            //没有月，设置为当前月份
+                            //不含年月的，从上一个获取的年月中找，还没有的话再设定为当前年月
                             if (!appendedStr.Contains("月"))
                             {
-                                _date = DateTime.Now.ToString("MM") + "月" + _date;
+                                if (currentMonth.Length != 0)
+                                {
+                                    _date = currentMonth + "月" + _date;
+                                }
+                                else
+                                {
+                                    _date = DateTime.Now.ToString("MM") + "月" + _date;
+                                    currentMonth = DateTime.Now.ToString("MM");
+                                }
                             }
-                            //如果没有年，则设置为当前年份
+                            else
+                            {
+                                if (appendedStr.Contains("年"))
+                                {
+                                    currentMonth = appendedStr.Split('月')[0].Split('年')[1];
+                                }
+                                else
+                                {
+                                    currentMonth = appendedStr.Split('月')[0];
+                                }
+
+                            }
+                            //如果没有年，则设置为当前年份,同时存入current
                             if (!appendedStr.Contains("年"))
                             {
-                                _date = DateTime.Now.ToString("yyyy") + "年" + _date;
+                                if (currentYear.Length != 0)
+                                {
+                                    _date = currentYear + "年" + _date;
+                                }
+                                else
+                                {
+                                    _date = DateTime.Now.ToString("yyyy") + "年" + _date;
+                                    currentYear = DateTime.Now.ToString("yyyy");
+                                }
+
+                            }
+                            else
+                            {
+                                currentYear = appendedStr.Split('年')[0];
                             }
                             //_date = regChineseWord.Replace(_date.Replace("-","").Replace("年", "-").Replace("月", "-").Replace("日", "").Replace("至", "~").Trim(), "");
+                            // + date.Split('年')[1];
+                            //把“年”之前的数字去掉
+                            string _tempYear = "";
+                            bool hasFoundFirstYear = false;
                             char[] _dateChar = appendedStr.ToCharArray();
                             for (int d = 0; d < _dateChar.Length; d++)
                             {
+                                if (_date.Contains("年") && !hasFoundFirstYear)
+                                {
+                                    Regex r;
+                                    if (_date.Contains("月"))
+                                    {
+                                        r = new Regex(@"\d\d\d\d年\d+月");
+                                    }
+                                    else
+                                    {
+                                        r = new Regex(@"\d\d\d\d年");
+                                    }
+                                    bool ismatch = r.IsMatch(_date);
+                                    MatchCollection mc = r.Matches(_date);
+                                    string result = string.Empty;
+                                    //只取第一个年
+                                    result += mc[0];//匹配结果是完整的数字，此处可以不做拼接的
+                                    _date = result;
+                                    hasFoundFirstYear = true;
+                                }
                                 if (Regex.IsMatch(_dateChar[d].ToString(), @"^[0-9]+$") ||
                                     Regex.IsMatch(_dateChar[d].ToString(), @"^[年]+$") ||
                                     Regex.IsMatch(_dateChar[d].ToString(), @"^[月]+$") ||
@@ -659,6 +749,25 @@ namespace TrainProjectAnalyse
                                     _dateChar[d].ToString().Equals("-"))
                                 {
                                     _date = _date + _dateChar[d].ToString();
+                                    if (_date.Contains("年") && !hasFoundFirstYear)
+                                    {
+                                        Regex r;
+                                        if (_date.Contains("月"))
+                                        {
+                                            r = new Regex(@"\d\d\d\d年\d+月");
+                                        }
+                                        else
+                                        {
+                                            r = new Regex(@"\d\d\d\d年");
+                                        }
+                                        bool ismatch = r.IsMatch(_date);
+                                        MatchCollection mc = r.Matches(_date);
+                                        string result = string.Empty;
+                                        //只取第一个年
+                                        result += mc[0];//匹配结果是完整的数字，此处可以不做拼接的
+                                        _date = result;
+                                        hasFoundFirstYear = true;
+                                    }
                                 }
                             }
                             //strDate.Add(_date);
@@ -710,7 +819,9 @@ namespace TrainProjectAnalyse
                     if(appendedStr.Contains("停运") ||
                     appendedStr.Contains("停开") ||
                     appendedStr.Contains("恢复运行") ||
-                    appendedStr.Contains("开行"))
+                    appendedStr.Contains("开行")||
+                    appendedStr.Contains("加开"))
+
                     {
                         if(_tempModels.Count  == 0)
                         {
@@ -722,7 +833,8 @@ namespace TrainProjectAnalyse
                             currentStatus = 0;
                         }
                         else if (appendedStr.Contains("恢复")||
-                            appendedStr.Contains("开行"))
+                            appendedStr.Contains("开行")||
+                            appendedStr.Contains("加开"))
                         {
                             //Status.Add(1);
                             currentStatus = 1;
@@ -1262,6 +1374,207 @@ namespace TrainProjectAnalyse
             {
                 Clipboard.SetText(selectText);
             }
+        }
+
+        private void deleteCMDays_txt_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void deleteCMDays_txt_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //限制为数字
+            if (!(Char.IsNumber(e.KeyChar)) && e.KeyChar != (char)13 && e.KeyChar != (char)8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        public bool DelRow(ISheet sheet, int startRow, int delCount, int type)
+        {
+            //sheet.ShiftRows(startRow + 1, sheet.LastRowNum, -1, false, false);//删除一行（为负数只能为-1）
+            try
+            {
+                //最后一行用remove
+                if (startRow == sheet.LastRowNum)
+                {
+                    sheet.RemoveRow(sheet.GetRow(startRow));
+                }
+                for (int i = 0; i < delCount; i++)
+                {
+                    sheet.ShiftRows(startRow + 1, sheet.LastRowNum, -1);
+                }
+
+                DeleteEmptyRow(type);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+        }
+
+        //删除空行
+        private void DeleteEmptyRow(int type)
+        {
+            ISheet sheet = null;
+            if (type == 0)
+            {
+                sheet = WorkBook.GetSheet("Commands");
+            }
+            else if (type == 1)
+            {
+                sheet = WorkBook.GetSheet("Trains");
+            }
+            if (sheet == null)
+            {
+                return;
+            }
+            //删除空行
+            int lastRow = sheet.LastRowNum;
+            for (int ij = 0; ij <= lastRow; ij++)
+            {
+                if (ij > sheet.LastRowNum - 1)
+                {
+                    break;
+                }
+                if (sheet.GetRow(ij) == null)
+                {
+                    sheet.ShiftRows(ij + 1, sheet.LastRowNum, -1);
+                    ij = ij - 1;
+                    lastRow = lastRow - 1;
+                }
+                else
+                {
+                    if (sheet.GetRow(ij).GetCell(0) == null)
+                    {
+                        sheet.ShiftRows(ij + 1, sheet.LastRowNum, -1);
+                        ij = ij - 1;
+                        lastRow = lastRow - 1;
+                    }
+                    else
+                    {
+                        if (sheet.GetRow(ij).GetCell(0).ToString().Trim().Length == 0)
+                        {
+                            sheet.ShiftRows(ij + 1, sheet.LastRowNum, -1);
+                            ij = ij - 1;
+                            lastRow = lastRow - 1;
+                        }
+                    }
+                }
+
+            }
+            //避免标题被删除
+
+            if (sheet.GetRow(0) == null)
+            {
+                sheet.CreateRow(0);
+            }
+            if (type == 0)
+            {
+                sheet.GetRow(0).GetCell(0).SetCellValue("添加日期");
+                sheet.GetRow(0).GetCell(1).SetCellValue("命令号");
+                sheet.GetRow(0).GetCell(2).SetCellValue("文件名");
+                sheet.GetRow(0).GetCell(3).SetCellValue("编号");
+                sheet.GetRow(0).GetCell(4).SetCellValue("TrainIDCounter");
+            }
+            else if (type == 1)
+            {
+                sheet.GetRow(0).GetCell(0).SetCellValue("添加日期");
+                sheet.GetRow(0).GetCell(1).SetCellValue("命令号");
+                sheet.GetRow(0).GetCell(2).SetCellValue("命令位置");
+                sheet.GetRow(0).GetCell(3).SetCellValue("车次1");
+                sheet.GetRow(0).GetCell(4).SetCellValue("车次2");
+                sheet.GetRow(0).GetCell(5).SetCellValue("运行状态");
+                sheet.GetRow(0).GetCell(6).SetCellValue("日期列表");
+                sheet.GetRow(0).GetCell(7).SetCellValue("编号");
+            }
+        }
+
+        private void DeleteCommand(int days)
+        {
+            ISheet sheetCommand = WorkBook.GetSheet("Commands");
+            ISheet sheetTrain = WorkBook.GetSheet("Trains");
+            {
+               int lastRow = sheetCommand.LastRowNum;
+                for (int i = 1; i <= lastRow; i++)
+                {
+                    if (sheetCommand.GetRow(i) != null)
+                    {
+                        if (sheetCommand.GetRow(i).GetCell(0) != null)
+                        {
+                            DateTime _dt = new DateTime();
+                            if (DateTime.TryParse(sheetCommand.GetRow(i).GetCell(0).ToString(),out _dt))
+                            {
+                                int count = Convert.ToInt32((DateTime.Now.Date - _dt).TotalDays) - 1;
+                                if(count > days)
+                                {
+                                    if(DelRow(sheetCommand, i, 1, 0))
+                                    {
+                                        lastRow = lastRow - 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                int lastRowTrain = sheetTrain.LastRowNum;
+                for (int i = 1; i <= lastRowTrain; i++)
+                {
+                    if (sheetTrain.GetRow(i) != null)
+                    {
+                        if (sheetTrain.GetRow(i).GetCell(0) != null)
+                        {
+                            DateTime _dt = new DateTime();
+                            if (DateTime.TryParse(sheetTrain.GetRow(i).GetCell(0).ToString(), out _dt))
+                            {
+                                int count = Convert.ToInt32((DateTime.Now.Date - _dt).TotalDays) - 1;
+                                if (count > days)
+                                {
+                                    if (DelRow(sheetTrain, i, 1, 1))
+                                    {
+                                        lastRowTrain = lastRowTrain - 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //找出命令所在的行
+            }
+            //重新修改文件指定单元格样式
+            //删除空行
+            DeleteEmptyRow(0);
+            DeleteEmptyRow(1);
+            FileStream fs1 = File.OpenWrite(dataFileName);
+            WorkBook.Write(fs1);
+            fs1.Close();
+            RefreshUI();
+        }
+
+        //删除X天之前的命令
+        private void deleteCM_btn_Click(object sender, EventArgs e)
+        {
+            if (deleteCMDays_txt.Text.Length != 0)
+            {
+                if (!deleteCMDays_txt.Text.Equals("0"))
+                {
+                    if (MessageBox.Show("确定删除" + deleteCMDays_txt.Text + "天前的命令吗？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                    {
+                        int days = 0;
+                        if(int.TryParse(deleteCMDays_txt.Text, out days))
+                        {
+                            DeleteCommand(days);
+                        }
+
+                    }
+                }
+
+            }
+
+            //删除创建日期为X天之前的命令
+
         }
     }
 }

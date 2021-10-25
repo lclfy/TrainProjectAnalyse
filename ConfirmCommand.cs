@@ -38,6 +38,10 @@ namespace TrainProjectAnalyse
         //选中项目的ID
         string selectedID;
 
+        //显示停运和开行的车
+        bool showStopTrains;
+        bool showRunningTrains;
+
         public ConfirmCommand(IWorkbook _workbook,DateTime _dt,List<NormalCommandModel> _ncm,string _highSpeedCommand)
         {
             if(_highSpeedCommand.Length != 0)
@@ -62,6 +66,7 @@ namespace TrainProjectAnalyse
             allHighSpeedCommandModel = new List<TrainModel>();
             selectedID = "";
             searchedTableModel = new List<TimeTableModel>();
+
         }
         private void ConfirmCommand_Load(object sender, EventArgs e)
         {
@@ -77,6 +82,9 @@ namespace TrainProjectAnalyse
                 MessageBox.Show("时刻表文件未读取成功，请检查是否导入了正确的文件", "提示", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             command_rTb.Text = commandText;
+            //0为显示停运，1为显示开行
+            checkBox0.Checked = true;
+            checkBox1.Checked = true;
         }
 
         private void initList()
@@ -1482,7 +1490,11 @@ namespace TrainProjectAnalyse
                             item.SubItems.Add(_tm.startTime);
                             item.SubItems.Add(_tm.stopTime);
                             item.SubItems.Add(_tm.trackNum);
-                            mainList.Items.Add(item);
+                            if((showStopTrains && (_tm.streamStatus == 0 || _tm.streamStatus == -2)) ||
+                                (showRunningTrains && (_tm.streamStatus == 1 || _tm.streamStatus == -1)))
+                            {
+                                mainList.Items.Add(item);
+                            }
                         }
                     }
                 }
@@ -1937,6 +1949,19 @@ namespace TrainProjectAnalyse
         private void save_btn_Click(object sender, EventArgs e)
         {
             OutPutExcel();
+        }
+
+        //筛选停运与开行的车
+        private void checkBox0_CheckedChanged(object sender, EventArgs e)
+        {
+            showStopTrains = checkBox0.Checked;
+            showResult(0);
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            showRunningTrains = checkBox1.Checked;
+            showResult(0);
         }
     }
 }
